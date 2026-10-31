@@ -1,0 +1,19 @@
+{
+  "name": "impostor-facultad",
+  "version": "0.1.0",
+  "description": "Juego multijugador tipo impostor ambientado en la ESIT (ULL)",
+  "type": "module",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node --watch server/index.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "ws": "^8.22.1"
+  }
+}

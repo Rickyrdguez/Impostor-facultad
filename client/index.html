@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+    <meta name="theme-color" content="#2e3430" />
+    <title>Impostor en la ESIT</title>
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <canvas id="game"></canvas>
+
+    <!-- Zona táctil del joystick (mitad izquierda de la pantalla) -->
+    <div id="touch-zone" class="hidden">
+      <div id="stick"><div id="knob"></div></div>
+    </div>
+
+    <!-- Pantalla de inicio -->
+    <section id="home" class="screen">
+      <div class="card home-card">
+        <canvas id="logo" class="logo" width="160" height="120" aria-hidden="true"></canvas>
+        <h1 class="title">Impostor <span>en la ESIT</span></h1>
+        <p class="subtitle">Alguien en la facultad no está entregando las prácticas…</p>
+        <label class="field">
+          <span>Tu nombre</span>
+          <input id="name" maxlength="12" autocomplete="off" spellcheck="false" placeholder="Máx. 12 letras" />
+        </label>
+        <button id="btn-create" class="btn primary">Crear sala</button>
+        <div class="divider"><span>o únete con un código</span></div>
+        <div class="join-row">
+          <input id="code" maxlength="4" autocomplete="off" spellcheck="false" placeholder="ABCD" />
+          <button id="btn-join" class="btn secondary">Unirse</button>
+        </div>
+        <p id="home-error" class="error" role="alert"></p>
+      </div>
+    </section>
+
+    <!-- Interfaz durante la partida -->
+    <section id="hud" class="hidden">
+      <div class="card room-card">
+        <div class="room-head">
+          <div class="room-code">Sala <strong id="room-code"></strong></div>
+          <button id="btn-leave" class="btn small ghost">Salir</button>
+        </div>
+        <ul id="player-list"></ul>
+        <p class="hint">Muévete con <kbd>WASD</kbd> o las flechas</p>
+      </div>
+    </section>
+
+    <div id="toast" class="hidden" role="status"></div>
+
+    <script type="module" src="js/main.js"></script>
+  </body>
+</html>
