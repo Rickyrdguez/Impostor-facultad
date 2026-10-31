@@ -9,6 +9,7 @@ export const ROOM_CODE_LENGTH = 4;
 // Red
 export const SEND_RATE_MS = 50; // el cliente manda su posición ~20 veces/s
 export const INTERP_DELAY_MS = 100; // retraso de interpolación de los demás
+export const RECONNECT_GRACE_MS = 30000; // tiempo para volver tras una caída
 
 // Visión (radio en unidades del mundo)
 export const VISION_CREW = 300;

@@ -96,7 +96,7 @@ test('si el anfitrión se va, pasa a otro jugador', async () => {
   guest.send({ t: 'join', code: welcome.code, name: 'Beto' });
   const guestId = (await joined).id;
   const after = guest.waitFor((m) => m.t === 'room' && m.players.length === 1);
-  host.close();
+  host.send({ t: 'leave' });
   assert.equal((await after).hostId, guestId);
   guest.close();
 });

@@ -21,7 +21,8 @@ Ingeniería y Tecnología (ULL). Se juega online desde cualquier red.
   migrar a Cloudflare Workers + Durable Objects sin tocar las reglas.
 - Red solo en `server/index.js` (http, ws, ping), `server/rooms.js` (salas,
   sockets, tokens, reconexión) y `server/messages.js` (parseo y validación).
-- Cliente: `main` (bucle), `network`, `input`, `state`, `players` (movimiento
+- Cliente: `main` (bucle), `network` (socket + reintentos), `session` (entrar, salir,
+  reconectar), `input`, `state`, `players` (movimiento
   propio + interpolación), `render` (cámara, oscuridad), `mapview` (mapa
   pre-dibujado en un canvas aparte), `vision` (línea de visión por rayos, pura),
   `furniture`, `characters`, `ui`, `palette`.
@@ -37,7 +38,12 @@ Ingeniería y Tecnología (ULL). Se juega online desde cualquier red.
   `TICK_MS` (50 ms). El cliente interpola a los demás (~100 ms de retraso).
 - El servidor no se fía del cliente: valida velocidad, paredes y distancias.
 - URL del WebSocket calculada desde `location` (ws/wss).
-- Keepalive: ping cada 25 s. Reconexión con token (sessionStorage) durante 30 s.
+- Keepalive: ping cada 25 s desde el servidor. El cliente da la conexión por
+  muerta si pasan 4 s sin recibir nada (el servidor manda estado 20 veces/s).
+- Reconexión: token en sessionStorage (`client/js/session.js`). Una caída
+  (`rooms.drop`) marca al jugador como desconectado; si vuelve con `resume`
+  antes de `RECONNECT_GRACE_MS` (30 s) recupera su personaje; si no,
+  `tickAll` lo saca. "Salir" (`leave`) lo saca al momento.
 
 ## Estilo de código
 - Archivos cortos (idealmente < 200 líneas), funciones cortas y simples.

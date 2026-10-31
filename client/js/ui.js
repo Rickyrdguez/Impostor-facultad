@@ -24,6 +24,7 @@ export const els = {
   stick: $('stick'),
   knob: $('knob'),
   toast: $('toast'),
+  reconnecting: $('reconnecting'),
   logo: $('logo'),
 };
 
@@ -38,6 +39,10 @@ export function showGame() {
   els.hud.classList.remove('hidden');
   els.touchZone.classList.remove('hidden');
   els.homeError.textContent = '';
+}
+
+export function setReconnecting(on) {
+  els.reconnecting.classList.toggle('hidden', !on);
 }
 
 export function setHomeError(text) {

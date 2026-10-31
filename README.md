@@ -4,9 +4,10 @@ Juego multijugador por navegador tipo "impostor", ambientado en la Escuela
 Superior de Ingeniería y Tecnología (Universidad de La Laguna). Cada jugador
 es un lenguaje de programación con birrete; uno de ellos es el impostor.
 
-> Proyecto en desarrollo por fases. Ahora mismo (fase 1): salas con código,
+> Proyecto en desarrollo por fases. Ahora mismo (fase 2): salas con código,
 > movimiento por el mapa de la facultad con colisiones, varios jugadores
-> viéndose entre sí y visión dinámica (las paredes tapan la vista).
+> viéndose entre sí, visión dinámica (las paredes tapan la vista) y juego
+> online desde cualquier red con reconexión automática.
 
 ## Ejecutar en local
 
@@ -23,6 +24,68 @@ reinicia el servidor al cambiar archivos.
 
 Al arrancar, el servidor imprime también las IPs de tu red local
 (`http://192.168.x.x:3000`) para jugar desde el móvil en la misma wifi.
+
+## Jugar online (desplegar en Render)
+
+El servidor es un único proceso de Node que sirve la web y los WebSockets en
+el mismo puerto, así que se puede desplegar gratis en
+[Render](https://render.com) y jugar desde cualquier red (casa, datos
+móviles, wifi de la facultad).
+
+1. **Sube el proyecto a GitHub.** Crea un repositorio vacío en
+   https://github.com/new (sin README ni .gitignore) y, en la carpeta del
+   proyecto:
+
+   ```bash
+   git remote add origin https://github.com/TU_USUARIO/impostor-facultad.git
+   git push -u origin main
+   ```
+
+2. **Crea el servicio en Render.** Entra en https://dashboard.render.com con
+   tu cuenta de GitHub → **New** → **Web Service** → elige el repositorio.
+   Rellena:
+   - **Language / Runtime:** Node
+   - **Branch:** main
+   - **Build Command:** `npm install`
+   - **Start Command:** `npm start`
+   - **Instance Type:** Free
+
+   (Alternativa: **New → Blueprint** usa el archivo `render.yaml` del
+   repositorio y lo configura todo solo.)
+
+3. **Espera al despliegue** (un par de minutos). Render te da una URL del tipo
+   `https://impostor-facultad.onrender.com`.
+
+4. **Comprueba que vive:** abre `https://TU-URL.onrender.com/health`; debe
+   responder `ok`. Después abre la URL principal y crea una sala.
+
+5. **Pasa el enlace a tus amigos.** Cada vez que hagas `git push`, Render
+   vuelve a desplegar solo.
+
+### Importante: el plan gratuito se duerme
+
+Si nadie lo usa durante ~15 minutos, Render apaga el servidor. La siguiente
+visita lo despierta, pero tarda entre 30 s y un minuto. **Abre el enlace (o
+`/health`) unos minutos antes de jugar.** Al dormirse se pierden las salas
+abiertas, nada más.
+
+### Si se corta la conexión
+
+Si a alguien se le bloquea la pantalla o cambia de wifi a datos, el juego
+muestra "Reconectando…" y vuelve solo. Tiene 30 segundos para volver con su
+mismo personaje; pasado ese tiempo sale de la sala. Recargar la página
+también recupera la partida (dentro de esos 30 s y en la misma pestaña).
+
+### Plan B: sin internet
+
+- **Misma wifi:** ejecuta `npm start` en un portátil y abre en los móviles la
+  IP que imprime el servidor (`http://192.168.x.x:3000`). Algunas redes, como
+  la de la universidad, aíslan a los dispositivos entre sí; en ese caso usa
+  la opción siguiente.
+- **Hotspot del móvil:** activa la zona wifi en un móvil, conecta a ella el
+  portátil y los demás móviles, y usa la IP que imprime el servidor.
+- Si Windows pregunta por el firewall al arrancar Node, permite el acceso en
+  redes privadas.
 
 ## Controles
 

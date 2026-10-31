@@ -70,7 +70,7 @@ function onConnection(ws) {
   ws.isAlive = true;
   ws.on('pong', () => (ws.isAlive = true));
   ws.on('message', (data) => handleMessage(ws, data));
-  ws.on('close', () => rooms.leave(ws));
+  ws.on('close', () => rooms.drop(ws));
   ws.on('error', () => ws.terminate());
 }
 

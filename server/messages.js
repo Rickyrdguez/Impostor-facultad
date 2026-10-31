@@ -20,7 +20,10 @@ function cleanCode(raw) {
   return raw.toUpperCase().replace(/[^A-Z]/g, '').slice(0, ROOM_CODE_LENGTH);
 }
 
-const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
+const TOKEN_MAX_LENGTH = 64;
+const ENTRY_TYPES = new Set(['create', 'join', 'resume']); // mensajes para entrar en una sala
+
+const isNum =(v) => typeof v === 'number' && Number.isFinite(v);
 
 // Cada tipo de mensaje: comprobación de formato + acción.
 const handlers = {
@@ -31,6 +34,10 @@ const handlers = {
   join: {
     valid: (m) => typeof m.code === 'string',
     run: (ws, m) => rooms.joinRoom(ws, cleanCode(m.code), cleanName(m.name)),
+  },
+  resume: {
+    valid: (m) => typeof m.token === 'string' && m.token.length <= TOKEN_MAX_LENGTH,
+    run: (ws, m) => rooms.resume(ws, m.token),
   },
   leave: {
     valid: () => true,
@@ -66,6 +73,6 @@ export function handleMessage(ws, data) {
   const handler = msg && Object.hasOwn(handlers, msg.t) ? handlers[msg.t] : null;
   if (!handler || !handler.valid(msg)) return;
   // No se puede crear o unirse a otra sala sin salir antes.
-  if ((msg.t === 'create' || msg.t === 'join') && ws.ctx) return;
+  if (ENTRY_TYPES.has(msg.t) && ws.ctx) return;
   handler.run(ws, msg);
 }
