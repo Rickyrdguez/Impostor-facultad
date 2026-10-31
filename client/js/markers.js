@@ -108,3 +108,40 @@ export function drawEdgeArrow(ctx, sx, sy, w, h, color, scale = 1) {
   ctx.stroke();
   ctx.restore();
 }
+
+const VENT_ARROW_COLOR = '#8e5cc8';
+const VENT_ARROW_SIZE = 22;
+const VENT_LABEL_GAP = 40; // distancia del nombre de la sala a la punta de la flecha
+
+// Flecha dentro de una trampilla: apunta a otra trampilla y lleva el nombre de su sala.
+export function drawVentArrow(ctx, arrow, now) {
+  const pulse = 1 + Math.sin(now / 250) * 0.08;
+  const size = VENT_ARROW_SIZE * pulse;
+  ctx.save();
+  ctx.translate(arrow.x, arrow.y);
+  ctx.rotate(arrow.angle);
+  ctx.fillStyle = VENT_ARROW_COLOR;
+  ctx.strokeStyle = '#ffffff';
+  ctx.lineWidth = 4;
+  ctx.lineJoin = 'round';
+  ctx.beginPath();
+  ctx.moveTo(size, 0);
+  ctx.lineTo(-size * 0.8, size * 0.85);
+  ctx.lineTo(-size * 0.35, 0);
+  ctx.lineTo(-size * 0.8, -size * 0.85);
+  ctx.closePath();
+  ctx.stroke();
+  ctx.fill();
+  ctx.restore();
+  // Nombre de la sala, un poco más allá de la flecha
+  const lx = arrow.x + Math.cos(arrow.angle) * VENT_LABEL_GAP;
+  const ly = arrow.y + Math.sin(arrow.angle) * VENT_LABEL_GAP;
+  ctx.font = '700 15px Fredoka, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = 'rgba(25, 20, 15, 0.85)';
+  ctx.strokeText(arrow.room, lx, ly);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(arrow.room, lx, ly);
+}

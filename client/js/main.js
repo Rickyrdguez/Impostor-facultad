@@ -12,7 +12,7 @@ import { bindHud, updateButtons } from './hud.js';
 import { bindMeeting, isMeetingOpen, updateMeeting } from './meeting.js';
 import { bindEnd } from './endscreen.js';
 import { bindMinimap, toggleMinimap, updateMinimap } from './minimap.js';
-import { bindVentPanel } from './ventui.js';
+import { bindVentPanel, updateVentInput, ventArrows } from './ventui.js';
 import { bindSabotage, openMenu, pendingFixPoints, updateSabotage } from './sabotageui.js';
 import { act, pendingTasks } from './actions.js';
 import { bindMinigames, isMinigameOpen } from './minigames/index.js';
@@ -69,6 +69,7 @@ function gameView() {
     bodies,
     markers,
     alerts,
+    ventArrows: ventArrows(),
   };
 }
 
@@ -94,6 +95,7 @@ function frame(now) {
   lastFrame = now;
   if (state.screen === 'game' && state.me.placed) {
     if (canWalk()) updateMe(dt, !amAlive());
+    updateVentInput();
     updateOthers();
     updateButtons();
     updateMeeting();
@@ -122,7 +124,7 @@ async function start() {
   bindMeeting();
   bindEnd();
   bindMinimap();
-  bindVentPanel();
+  bindVentPanel(document.getElementById('game'));
   bindSabotage();
   bindMinigames();
   ui.bindSoundButton();

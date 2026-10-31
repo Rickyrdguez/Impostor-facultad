@@ -3,7 +3,7 @@
 import { MAP } from './map.js';
 import { buildMapCanvas } from './mapview.js';
 import { drawCharacter } from './characters.js';
-import { drawCorpse, drawEdgeArrow, drawTaskMarker } from './markers.js';
+import { drawCorpse, drawEdgeArrow, drawTaskMarker, drawVentArrow } from './markers.js';
 import { PALETTE } from './palette.js';
 import { buildVisionGrid, visibilityPolygon, canSee } from './vision.js';
 import { PLAYER_RADIUS } from '../../shared/constants.js';
@@ -22,6 +22,7 @@ let fog; // canvas de la niebla (mismo tamaño que la pantalla)
 let fogCtx;
 let mapCanvas = null;
 let dpr = 1;
+let lastTransform = [1, 0, 0, 1, 0, 0]; // cámara del último fotograma
 
 export function initRender(el) {
   canvas = el;
@@ -44,6 +45,12 @@ function resize() {
 function cameraScale() {
   const view = innerWidth < innerHeight ? VIEW_SIZE_PORTRAIT : VIEW_SIZE;
   return (Math.min(innerWidth, innerHeight) / view) * dpr;
+}
+
+// Convierte un punto de la pantalla (px CSS) a coordenadas del mundo.
+export function screenToWorld(clientX, clientY) {
+  const [s, , , , tx, ty] = lastTransform;
+  return { x: (clientX * dpr - tx) / s, y: (clientY * dpr - ty) / s };
 }
 
 // Canvas con el mapa pre-dibujado (lo reutiliza el mapa de la tecla M).
@@ -100,6 +107,7 @@ function isVisible(c, view) {
 //   vision: radio de visión, o Infinity si no hay niebla (fantasmas, inicio)
 //   characters: personajes a dibujar   bodies: cuerpos [{ x, y, lang }]
 //   markers: estaciones de mis tareas [[x, y]]   alerts: puntos de sabotaje [[x, y]]
+//   ventArrows: flechas dentro de una trampilla [{ x, y, angle, room }]
 // }
 export function render(view) {
   const s = cameraScale();
@@ -108,6 +116,7 @@ export function render(view) {
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   const transform = [s, 0, 0, s, canvas.width / 2 - view.cx * s, canvas.height / 2 - view.cy * s];
+  lastTransform = transform;
   ctx.setTransform(...transform);
   if (mapCanvas) ctx.drawImage(mapCanvas, 0, 0, MAP.width, MAP.height);
 
@@ -122,6 +131,7 @@ export function render(view) {
   const now = performance.now();
   for (const [x, y] of view.markers || []) drawTaskMarker(ctx, x, y, now);
   for (const [x, y] of view.alerts || []) drawTaskMarker(ctx, x, y, now, ALERT_COLOR);
+  for (const arrow of view.ventArrows || []) drawVentArrow(ctx, arrow, now);
 
   // Flechas en el borde hacia lo que queda fuera de la pantalla.
   ctx.setTransform(1, 0, 0, 1, 0, 0);

@@ -385,11 +385,13 @@
   margin: 0;
 }
 
-.vent-links {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
+.vent-panel .hint {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+#touch-zone.in-vent {
+  display: none;
 }
 
 /* ---------- Mapa ---------- */
