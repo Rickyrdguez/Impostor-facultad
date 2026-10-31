@@ -11,6 +11,7 @@ import {
   TASKS_PER_PLAYER,
 } from './config.js';
 import { playerList, roomInfo, taskProgress, tasksMessage, toAll } from './info.js';
+import { resetSabotage, sabotageMessage } from './sabotage.js';
 
 const error = (id, text) => ({ to: id, msg: { t: 'error', text } });
 
@@ -88,7 +89,13 @@ export function startGame(room, id, msg, now) {
   room.emergencyReadyAt = now + EMERGENCY_COOLDOWN_MS;
   room.bodies = [];
   room.meeting = null;
-  const out = [toAll(roomInfo(room)), toAll(taskProgress(room)), toAll({ t: 'bodies', list: [] })];
+  const out = [
+    toAll(roomInfo(room)),
+    toAll(taskProgress(room)),
+    toAll({ t: 'bodies', list: [] }),
+    ...resetSabotage(room, now),
+    toAll(sabotageMessage(room, now)),
+  ];
   for (const p of players) {
     out.push({ to: p.id, msg: roleMessage(room, p) }, { to: p.id, msg: tasksMessage(p) });
     if (p.role === 'impostor') out.push({ to: p.id, msg: { t: 'cooldown', ms: KILL_COOLDOWN_MS } });
@@ -109,7 +116,13 @@ export function backToLobby(room, now) {
   room.bodies = [];
   room.meeting = null;
   room.result = null;
-  return [toAll(roomInfo(room)), toAll({ t: 'bodies', list: [] }), ...sendAllToSpawn(room, now)];
+  room.sabotage = null;
+  return [
+    toAll(roomInfo(room)),
+    toAll({ t: 'bodies', list: [] }),
+    toAll(sabotageMessage(room, now)),
+    ...sendAllToSpawn(room, now),
+  ];
 }
 
 // Tras la pantalla final, el anfitrión devuelve a todos a la sala.

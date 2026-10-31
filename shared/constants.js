@@ -22,6 +22,18 @@ export const REPORT_RANGE = 110; // distancia para reportar un cuerpo
 export const TASK_HOLD_MS = 1200; // mantener E para completar una tarea
 export const CHAT_MAX_LENGTH = 120;
 
+// Sabotajes del impostor
+export const LIGHTS_VISION = 110; // radio de visión de los tripulantes con las luces apagadas
+export const SABOTAGES = [
+  { id: 'wifi', name: 'Tirar el wifi', alarm: '¡Se ha caído el wifi!', fix: 'Reinícialo en el armario de red (Exterior)' },
+  { id: 'luces', name: 'Apagar las luces', alarm: '¡Se han ido las luces!', fix: 'Sube los interruptores del cuadro (Pasillo)' },
+  { id: 'radon', name: 'Fuga de radón', alarm: '¡Fuga de radón!', fix: 'Ciérrala en el Laboratorio y en Secretaría' },
+];
+
+export function sabotageById(id) {
+  return SABOTAGES.find((s) => s.id === id) || null;
+}
+
 // Tareas: nombre que ve el jugador. Su estación está en client/js/map.js.
 export const TASKS = [
   { id: 'matricula', name: 'Sellar la matrícula', room: 'Secretaría' },

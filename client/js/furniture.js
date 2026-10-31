@@ -111,6 +111,19 @@ export function drawStation(ctx, [x, y]) {
   ctx.fillRect(x - 6, y - 4, 5, 2);
 }
 
+// Punto de arreglo de sabotajes: caja metálica con franjas de aviso.
+export function drawFixPoint(ctx, x, y) {
+  drawBox(ctx, [x - 15, y - 15, 30, 30], [PALETTE.metal, PALETTE.metalDark, '#e4e6e8']);
+  ctx.fillStyle = PALETTE.tassel;
+  ctx.fillRect(x - 11, y - 10, 22, 6);
+  ctx.fillStyle = PALETTE.brick;
+  for (let i = -11; i < 11; i += 6) ctx.fillRect(x + i, y - 10, 3, 6);
+  ctx.fillStyle = '#e53935';
+  ctx.beginPath();
+  ctx.arc(x, y + 4, 4, 0, Math.PI * 2);
+  ctx.fill();
+}
+
 // Trampilla: rejilla metálica en el suelo.
 export function drawVent(ctx, x, y) {
   drawBox(ctx, [x - 20, y - 14, 40, 28], [PALETTE.metalDark, '#5f6368', PALETTE.metal]);

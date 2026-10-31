@@ -3,7 +3,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { MAP, ROOMS, canStand, spawnPoint } from '../client/js/map.js';
-import { STATIONS, VENTS, EMERGENCY } from '../client/js/places.js';
+import { STATIONS, VENTS, EMERGENCY, FIX_POINTS } from '../client/js/places.js';
 import { PLAYER_RADIUS, TASKS, USE_RANGE } from '../shared/constants.js';
 import { MAX_PLAYERS } from '../server/config.js';
 
@@ -88,4 +88,8 @@ test('las trampillas están en el suelo y se puede llegar a ellas', () => {
 
 test('se puede llegar al botón de emergencia', () => {
   assert.ok(reachableNear(EMERGENCY.x, EMERGENCY.y, USE_RANGE * 0.8));
+});
+
+test('se puede llegar a los puntos donde se arreglan los sabotajes', () => {
+  for (const p of FIX_POINTS) assert.ok(reachableNear(p.x, p.y, USE_RANGE * 0.7), p.id);
 });

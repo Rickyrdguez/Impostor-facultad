@@ -92,6 +92,9 @@ export function emergency(room, id, msg, now) {
     const s = Math.ceil((room.emergencyReadyAt - now) / 1000);
     return [{ to: id, msg: { t: 'notice', text: `El botón estará listo en ${s} s.` } }];
   }
+  if (room.sabotage) {
+    return [{ to: id, msg: { t: 'notice', text: 'No se puede convocar una reunión durante un sabotaje.' } }];
+  }
   p.emergencyUsed = true;
   return startMeeting(room, id, null, now);
 }

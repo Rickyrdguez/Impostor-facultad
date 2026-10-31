@@ -4,6 +4,7 @@
 import { state, amAlive, myInfo, phase, playerInfo } from './state.js';
 import * as net from './network.js';
 import { EMERGENCY, STATIONS, VENTS } from './places.js';
+import { pendingFixPoints } from './sabotageui.js';
 import { KILL_RANGE, REPORT_RANGE, TASK_HOLD_MS, USE_RANGE } from '../../shared/constants.js';
 
 const dist = (a, x, y) => Math.hypot(a.x - x, a.y - y);
@@ -53,9 +54,15 @@ export function useTarget() {
   const task = nearestTask();
   if (task) options.push({ kind: 'task', id: task.id, d: task.d });
   const me = myInfo();
-  if (amAlive() && me && !me.buttonUsed) {
+  if (amAlive() && me && !me.buttonUsed && !state.sabotage) {
     const d = dist(state.me, EMERGENCY.x, EMERGENCY.y);
     if (d <= USE_RANGE) options.push({ kind: 'emergency', id: 'emergency', d });
+  }
+  if (amAlive()) {
+    for (const p of pendingFixPoints()) {
+      const d = dist(state.me, p.x, p.y);
+      if (d <= USE_RANGE) options.push({ kind: 'fix', id: p.id, d });
+    }
   }
   if (amAlive() && state.role === 'impostor') {
     for (const v of VENTS) {
@@ -72,8 +79,8 @@ function startUse() {
   if (!target) return;
   if (target.kind === 'emergency') return net.send({ t: 'emergency' });
   if (target.kind === 'vent') return net.send({ t: 'vent' });
-  state.hold = { id: target.id, start: performance.now() };
-  if (state.role === 'crew') net.send({ t: 'task-start' });
+  state.hold = { kind: target.kind, id: target.id, start: performance.now() };
+  if (target.kind === 'task' && state.role === 'crew') net.send({ t: 'task-start' });
 }
 
 // Botones y teclas llaman aquí: name = 'use' | 'kill' | 'report'.
@@ -102,8 +109,9 @@ export function updateActions() {
     return;
   }
   if (holdProgress() < 1) return;
-  const { id } = state.hold;
+  const { id, kind } = state.hold;
   state.hold = null;
-  if (state.role === 'crew') net.send({ t: 'task-done' });
+  if (kind === 'fix') net.send({ t: 'fix', point: id });
+  else if (state.role === 'crew') net.send({ t: 'task-done' });
   else state.fakeDone.add(id); // el impostor solo finge
 }

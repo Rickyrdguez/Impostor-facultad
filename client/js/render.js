@@ -11,6 +11,7 @@ import { PLAYER_RADIUS } from '../../shared/constants.js';
 const VIEW_SIZE = 620; // unidades del mundo visibles en el lado corto de la pantalla
 const MAX_DPR = 2;
 const MAP_PIXEL_BUDGET = 12e6; // límite de píxeles del mapa pre-dibujado
+const ALERT_COLOR = '#ff5a45'; // puntos donde arreglar un sabotaje
 const VISION_FADE = 0.8; // parte del radio que se ve con luz plena
 const FOG_SCALE = 0.35; // la niebla se dibuja a menos resolución: borde suave y barato
 
@@ -96,7 +97,8 @@ function isVisible(c, view) {
 //   cx, cy: centro de la cámara (el jugador)
 //   vision: radio de visión, o Infinity si no hay niebla (fantasmas, inicio)
 //   characters: personajes a dibujar   bodies: cuerpos [{ x, y, lang }]
-//   markers: estaciones de mis tareas [[x, y]]   ring: progreso de la tarea (0-1) o null
+//   markers: estaciones de mis tareas [[x, y]]   alerts: puntos de sabotaje [[x, y]]
+//   ring: progreso de la tarea (0-1) o null
 // }
 export function render(view) {
   const s = cameraScale();
@@ -119,4 +121,5 @@ export function render(view) {
   ctx.setTransform(...transform);
   const now = performance.now();
   for (const [x, y] of view.markers || []) drawTaskMarker(ctx, x, y, now);
+  for (const [x, y] of view.alerts || []) drawTaskMarker(ctx, x, y, now, ALERT_COLOR);
 }

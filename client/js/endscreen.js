@@ -19,6 +19,7 @@ const REASONS = {
   impostor: 'El impostor ha sido descubierto.',
   tasks: 'Los tripulantes han terminado todas las tareas.',
   kills: 'Ya no quedan suficientes tripulantes para pararle.',
+  radon: 'La fuga de radón no se cerró a tiempo.',
 };
 
 let result = null;

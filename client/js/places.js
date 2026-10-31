@@ -40,6 +40,18 @@ export const VENTS = [
   { id: 'terraza', room: 'Terraza', net: 'd', x: 1100, y: 2225 },
 ];
 
+// Puntos donde se arregla cada sabotaje. El radón necesita los dos.
+export const FIX_POINTS = [
+  { id: 'red', sabotage: 'wifi', room: 'Exterior', x: 1650, y: 1010 },
+  { id: 'cuadro', sabotage: 'luces', room: 'Pasillo', x: 485, y: 1250 },
+  { id: 'radon-lab', sabotage: 'radon', room: 'Laboratorio', x: 305, y: 1525 },
+  { id: 'radon-secre', sabotage: 'radon', room: 'Secretaría', x: 600, y: 120 },
+];
+
+export function fixPointsOf(sabotage) {
+  return FIX_POINTS.filter((p) => p.sabotage === sabotage);
+}
+
 export function ventById(id) {
   return VENTS.find((v) => v.id === id) || null;
 }

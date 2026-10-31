@@ -12,6 +12,7 @@ import { isImpostor, playerList, roomInfo, toAll } from './info.js';
 import { sendAllToSpawn } from './lobby.js';
 import { checkVictory } from './victory.js';
 import { leaveAllVents } from './vents.js';
+import { onMeetingStart } from './sabotage.js';
 
 const SKIP = 'skip';
 
@@ -25,6 +26,7 @@ export function startMeeting(room, callerId, bodyId, now) {
   for (const p of playerList(room)) p.taskStart = null;
   return [
     ...leaveAllVents(room),
+    ...onMeetingStart(room, now),
     toAll(roomInfo(room)),
     toAll({ t: 'bodies', list: [] }),
     toAll({ t: 'meeting', caller: callerId, body: bodyId, ms: MEETING_MS }),

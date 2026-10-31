@@ -433,3 +433,112 @@
   border: none;
   color: #fff;
 }
+
+/* ---------- Sabotajes ---------- */
+
+.act.sabotage {
+  background: #6d4aa8;
+}
+
+.alarm {
+  position: fixed;
+  top: calc(max(12px, env(safe-area-inset-top)) + 46px);
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 16px;
+  border-radius: 14px;
+  background: rgba(168, 40, 30, 0.92);
+  color: #fff;
+  text-align: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+  animation: alarm 1s ease-in-out infinite;
+  max-width: calc(100% - 32px);
+  pointer-events: none;
+}
+
+.alarm strong {
+  font-size: 1.15rem;
+}
+
+.alarm span {
+  font-size: 0.85rem;
+}
+
+.alarm-time {
+  font-size: 1.4rem !important;
+  font-weight: 700;
+}
+
+.alarm-time:empty {
+  display: none;
+}
+
+@keyframes alarm {
+  50% {
+    background: rgba(220, 70, 50, 0.95);
+  }
+}
+
+.radon-flash {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 120px 40px rgba(220, 40, 30, 0.55);
+  animation: flash 1s ease-in-out infinite;
+}
+
+@keyframes flash {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.sabotage-card {
+  width: min(420px, 100%);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  text-align: center;
+  animation: pop 0.2s ease-out;
+}
+
+.sabotage-card h2 {
+  margin: 0;
+  color: #6d4aa8;
+}
+
+.sabotage-options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sabotage-options .btn {
+  background: #6d4aa8;
+  color: #fff;
+}
+
+.sabotage-options .btn:disabled {
+  filter: grayscale(0.8);
+  opacity: 0.6;
+  cursor: default;
+}
+
+.sabotage-card .hint {
+  margin: 0;
+}
+
+/* Durante la partida la tarjeta de la sala crece lo justo para que quepa en una línea */
+.room-card.compact {
+  width: auto;
+}
+
+.room-card.compact .room-head {
+  flex-wrap: nowrap;
+  white-space: nowrap;
+}

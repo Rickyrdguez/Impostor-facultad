@@ -1,9 +1,9 @@
 // Dibuja el mapa estático una sola vez en un canvas aparte.
 
 import { MAP, ROOMS, DOORS, OBSTACLES, DECOR } from './map.js';
-import { STATIONS, VENTS } from './places.js';
+import { FIX_POINTS, STATIONS, VENTS } from './places.js';
 import { PALETTE, FLOORS } from './palette.js';
-import { drawObstacle, drawStation, drawVent } from './furniture.js';
+import { drawFixPoint, drawObstacle, drawStation, drawVent } from './furniture.js';
 
 const WALL = 22; // grosor de pared visto desde arriba
 const FACE = 16; // altura de la cara de ladrillo
@@ -173,5 +173,6 @@ export function buildMapCanvas(scale) {
   VENTS.forEach((v) => drawVent(ctx, v.x, v.y));
   OBSTACLES.forEach((o) => drawObstacle(ctx, o));
   Object.values(STATIONS).forEach((pos) => drawStation(ctx, pos));
+  FIX_POINTS.forEach((p) => drawFixPoint(ctx, p.x, p.y));
   return canvas;
 }

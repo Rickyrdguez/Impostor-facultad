@@ -6,17 +6,17 @@ import { PLAYER_RADIUS, languageById } from '../../shared/constants.js';
 const PULSE_MS = 900;
 
 // Aro amarillo que late sobre las estaciones de mis tareas pendientes.
-export function drawTaskMarker(ctx, x, y, now) {
+export function drawTaskMarker(ctx, x, y, now, color = PALETTE.tassel) {
   const pulse = (Math.sin((now / PULSE_MS) * Math.PI * 2) + 1) / 2;
   ctx.save();
-  ctx.strokeStyle = PALETTE.tassel;
+  ctx.strokeStyle = color;
   ctx.globalAlpha = 0.5 + pulse * 0.5;
   ctx.lineWidth = 3;
   ctx.beginPath();
   ctx.arc(x, y, 20 + pulse * 6, 0, Math.PI * 2);
   ctx.stroke();
   // Flecha encima
-  ctx.fillStyle = PALETTE.tassel;
+  ctx.fillStyle = color;
   ctx.beginPath();
   const top = y - 34 - pulse * 4;
   ctx.moveTo(x - 8, top - 10);

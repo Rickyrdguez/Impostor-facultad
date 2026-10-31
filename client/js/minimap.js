@@ -1,8 +1,9 @@
 // Mapa completo (tecla M): dónde estás, tus tareas pendientes y, para el impostor, las trampillas.
 
-import { state, phase, playerInfo } from './state.js';
+import { state, phase, playerInfo, wifiDown } from './state.js';
 import { MAP, ROOMS } from './map.js';
 import { STATIONS, VENTS, EMERGENCY } from './places.js';
+import { pendingFixPoints } from './sabotageui.js';
 import { getMapCanvas } from './render.js';
 import { pendingTasks } from './actions.js';
 import { PALETTE } from './palette.js';
@@ -86,7 +87,8 @@ export function updateMinimap(now) {
   const pulse = 1 + Math.sin(now / 200) * 0.2;
   dot(ctx, EMERGENCY.x, EMERGENCY.y, 6 * u, PALETTE.brick);
   if (state.role === 'impostor') for (const v of VENTS) dot(ctx, v.x, v.y, 5 * u, '#8e5cc8');
-  if (phase() === 'playing' && !state.wifiDown) {
+  for (const p of pendingFixPoints()) dot(ctx, p.x, p.y, 8 * u * pulse, '#ff5a45');
+  if (phase() === 'playing' && !wifiDown()) {
     for (const t of pendingTasks()) {
       const [x, y] = STATIONS[t.id];
       dot(ctx, x, y, 7 * u * pulse, PALETTE.tassel, PALETTE.cap);

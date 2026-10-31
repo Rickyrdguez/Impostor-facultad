@@ -203,3 +203,59 @@ test('trampillas: solo el impostor, invisible dentro y salto a las conectadas', 
   assert.equal(impostor.vent, null);
   assert.equal(Math.round(impostor.y), VENTS.find((v) => v.id === 'laboratorio').y);
 });
+
+test('sabotaje de luces: solo el impostor, con enfriamiento, y se arregla en el cuadro', async () => {
+  const sab = await import('../server/sabotage.js');
+  const { FIX_POINTS } = await import('../client/js/places.js');
+  const { SABOTAGE_COOLDOWN_MS } = await import('../server/config.js');
+  const { room, impostor, crew } = startedRoom(4);
+  const now = T0 + SABOTAGE_COOLDOWN_MS;
+  assert.deepEqual(sab.sabotage(room, crew[0].id, { kind: 'luces' }, now), []);
+  assert.deepEqual(sab.sabotage(room, impostor.id, { kind: 'luces' }, T0 + 1000), []); // enfriamiento
+  sab.sabotage(room, impostor.id, { kind: 'luces' }, now);
+  assert.equal(room.sabotage.kind, 'luces');
+  assert.deepEqual(sab.sabotage(room, impostor.id, { kind: 'wifi' }, now), []); // ya hay uno
+  const cuadro = FIX_POINTS.find((f) => f.id === 'cuadro');
+  Object.assign(crew[0], { x: cuadro.x + 300, y: cuadro.y });
+  sab.fix(room, crew[0].id, { point: 'cuadro' }, now);
+  assert.ok(room.sabotage, 'lejos no se arregla');
+  Object.assign(crew[0], { x: cuadro.x + 20, y: cuadro.y });
+  sab.fix(room, crew[0].id, { point: 'cuadro' }, now);
+  assert.equal(room.sabotage, null);
+});
+
+test('radón: hacen falta los dos puntos; si se acaba el tiempo gana el impostor', async () => {
+  const sab = await import('../server/sabotage.js');
+  const { FIX_POINTS } = await import('../client/js/places.js');
+  const { SABOTAGE_COOLDOWN_MS, RADON_MS } = await import('../server/config.js');
+  const a = startedRoom(4);
+  const now = T0 + SABOTAGE_COOLDOWN_MS;
+  sab.sabotage(a.room, a.impostor.id, { kind: 'radon' }, now);
+  const [lab, secre] = FIX_POINTS.filter((f) => f.sabotage === 'radon');
+  Object.assign(a.crew[0], { x: lab.x, y: lab.y + 20 });
+  sab.fix(a.room, a.crew[0].id, { point: lab.id }, now);
+  assert.ok(a.room.sabotage, 'con un punto no basta');
+  Object.assign(a.crew[1], { x: secre.x - 20, y: secre.y + 20 });
+  sab.fix(a.room, a.crew[1].id, { point: secre.id }, now);
+  assert.equal(a.room.sabotage, null);
+
+  const b = startedRoom(4);
+  sab.sabotage(b.room, b.impostor.id, { kind: 'radon' }, now);
+  game.tick(b.room, now + RADON_MS);
+  assert.equal(b.room.phase, 'ended');
+  assert.equal(b.room.result.winner, 'impostor');
+  assert.equal(b.room.result.reason, 'radon');
+});
+
+test('no se puede pulsar el botón de emergencia durante un sabotaje', async () => {
+  const sab = await import('../server/sabotage.js');
+  const { EMERGENCY } = await import('../client/js/places.js');
+  const { SABOTAGE_COOLDOWN_MS } = await import('../server/config.js');
+  const { room, impostor, crew } = startedRoom(4);
+  const now = T0 + SABOTAGE_COOLDOWN_MS;
+  sab.sabotage(room, impostor.id, { kind: 'wifi' }, now);
+  Object.assign(crew[0], { x: EMERGENCY.x + 50, y: EMERGENCY.y });
+  const out = actions.emergency(room, crew[0].id, {}, now);
+  assert.match(msgs(out, 'notice')[0].msg.text, /sabotaje/);
+  assert.equal(room.phase, 'playing');
+});

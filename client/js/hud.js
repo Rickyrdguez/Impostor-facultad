@@ -1,6 +1,6 @@
 // HUD de la partida: banner de rol, lista de tareas, progreso y botones de acción.
 
-import { state, amAlive, phase, playerInfo } from './state.js';
+import { state, amAlive, phase, playerInfo, wifiDown } from './state.js';
 import { act, killCooldownMs, killTarget, reportTarget, useTarget } from './actions.js';
 import { taskById } from '../../shared/constants.js';
 
@@ -25,7 +25,7 @@ const els = {
   mapBtn: $('btn-map'),
 };
 
-const USE_LABELS = { task: 'Usar', emergency: 'Reunión', vent: 'Trampilla' };
+const USE_LABELS = { task: 'Usar', emergency: 'Reunión', vent: 'Trampilla', fix: 'Arreglar' };
 let bannerTimer = null;
 
 // Los botones funcionan con ratón y con el dedo; "usar" hay que mantenerlo.
@@ -63,6 +63,12 @@ export function showRoleBanner() {
 }
 
 export function renderTasks() {
+  if (wifiDown()) {
+    els.taskTitle.textContent = 'Sin wifi';
+    const li = document.createElement('li');
+    li.textContent = 'No puedes ver tus tareas hasta que vuelva el wifi.';
+    return els.taskList.replaceChildren(li);
+  }
   const fake = state.role === 'impostor';
   els.taskCard.classList.toggle('fake', fake);
   els.taskTitle.textContent = fake ? 'Tareas falsas (disimula)' : 'Tus tareas';

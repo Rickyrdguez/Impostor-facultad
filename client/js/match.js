@@ -10,6 +10,7 @@ import { renderLobby } from './lobby.js';
 import { onSnapshot, setMyPosition } from './players.js';
 import { onVent } from './ventui.js';
 import { toggleMinimap } from './minimap.js';
+import { clearSabotage, onSabotage, onSabotageCooldown } from './sabotageui.js';
 
 let lastPhase = null;
 
@@ -19,6 +20,7 @@ function onPhaseChange(now) {
     onVent(null);
     toggleMinimap(false);
   }
+  if (now === 'lobby' || now === 'ended') clearSabotage();
   if (now === 'lobby') {
     resetMatch();
     end.hideEnd();
@@ -95,12 +97,21 @@ net.on('notice', (m) => ui.toast(m.text));
 
 net.on('vent', (m) => onVent(m.id));
 
+net.on('sabotage', (m) => {
+  const wasWifi = state.sabotage?.kind === 'wifi';
+  onSabotage(m);
+  if (wasWifi || m.kind === 'wifi') hud.renderTasks();
+});
+
+net.on('sabotage-cooldown', (m) => onSabotageCooldown(m.ms));
+
 // Al salir de la sala hay que olvidar la fase para que la próxima empiece limpia.
 export function forgetPhase() {
   lastPhase = null;
   resetMatch();
   onVent(null);
   toggleMinimap(false);
+  clearSabotage();
   meeting.closeMeeting();
   end.hideEnd();
 }

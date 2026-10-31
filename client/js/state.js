@@ -18,6 +18,8 @@ export const state = {
   killReadyAt: 0, // performance.now() a partir del cual se puede matar
   hold: null, // tarea en curso: { id, start }
   vent: null, // trampilla en la que está el impostor (o null)
+  sabotage: null, // sabotaje activo: { kind, endsAt, fixed: Set } o null
+  sabotageReadyAt: 0, // performance.now() a partir del cual el impostor puede sabotear
   mapOpen: false,
 };
 
@@ -52,4 +54,11 @@ export function resetMatch() {
   state.killReadyAt = 0;
   state.hold = null;
   state.vent = null;
+  state.sabotage = null;
+  state.sabotageReadyAt = 0;
+}
+
+// Con el wifi caído nadie ve sus tareas.
+export function wifiDown() {
+  return state.sabotage?.kind === 'wifi';
 }

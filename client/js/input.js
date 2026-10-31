@@ -1,7 +1,7 @@
 // Entrada: teclado (WASD / flechas) y joystick táctil.
 
 const keys = new Set();
-const ACTION_KEYS = { KeyE: 'use', KeyQ: 'kill', KeyR: 'report', KeyM: 'map' };
+const ACTION_KEYS = { KeyE: 'use', KeyQ: 'kill', KeyR: 'report', KeyM: 'map', KeyF: 'sabotage' };
 let onAction = () => {};
 const stick = { active: false, id: null, ox: 0, oy: 0, dx: 0, dy: 0 };
 const STICK_RADIUS = 50; // px de pantalla

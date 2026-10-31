@@ -10,6 +10,7 @@ import { playerCount, roomInfo, taskProgress, tasksMessage } from './info.js';
 import { backToLobby, placeAtSpawn, roleMessage } from './lobby.js';
 import { tickMeeting, forgetVoter } from './meeting.js';
 import { checkVictory } from './victory.js';
+import { sabotageMessage, tickSabotage } from './sabotage.js';
 
 export function createRoom(code) {
   return { code, hostId: null, phase: 'lobby', players: {}, bodies: [], meeting: null };
@@ -115,6 +116,10 @@ export function rejoinState(room, id, now) {
   }
   if (p.role === 'impostor') out.push(to({ t: 'cooldown', ms: Math.max(0, p.killReadyAt - now) }));
   if (p.vent) out.push(to({ t: 'vent', id: p.vent }));
+  if (room.sabotage) out.push(to(sabotageMessage(room, now)));
+  if (p.role === 'impostor') {
+    out.push(to({ t: 'sabotage-cooldown', ms: Math.max(0, (room.sabotageReadyAt || 0) - now) }));
+  }
   const m = room.meeting;
   if (m) {
     const ms = Math.max(0, m.endsAt - now);
@@ -127,7 +132,7 @@ export function rejoinState(room, id, now) {
 
 // Se llama cada TICK_MS: temporizadores y reparto de posiciones.
 export function tick(room, now) {
-  const out = room.phase === 'meeting' ? tickMeeting(room, now) : [];
+  const out = room.phase === 'meeting' ? tickMeeting(room, now) : tickSabotage(room, now);
   const forAlive = snapshot(room, false);
   const forGhosts = snapshot(room, true);
   for (const p of Object.values(room.players)) {

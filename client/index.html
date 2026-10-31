@@ -75,6 +75,10 @@
         <button id="act-report" class="act report" disabled>
           <span class="act-label">Reportar</span><kbd>R</kbd>
         </button>
+        <button id="act-sabotage" class="act sabotage">
+          <span id="sabotage-cd" class="act-cd"></span>
+          <span class="act-label">Sabotear</span><kbd>F</kbd>
+        </button>
         <button id="act-kill" class="act kill" disabled>
           <span id="kill-cd" class="act-cd"></span>
           <span class="act-label">Matar</span><kbd>Q</kbd>
@@ -84,6 +88,24 @@
         </button>
       </div>
     </section>
+
+    <!-- Alarma de sabotaje -->
+    <div id="radon-flash" class="radon-flash hidden"></div>
+    <div id="alarm" class="alarm hidden" role="alert">
+      <strong id="alarm-title"></strong>
+      <span id="alarm-text"></span>
+      <span id="alarm-time" class="alarm-time"></span>
+    </div>
+
+    <!-- Menú de sabotaje (solo el impostor) -->
+    <div id="sabotage-menu" class="overlay hidden">
+      <div class="card sabotage-card">
+        <h2>Sabotear</h2>
+        <div id="sabotage-options" class="sabotage-options"></div>
+        <p id="sabotage-hint" class="hint"></p>
+        <button id="btn-sabotage-close" class="btn ghost">Cerrar</button>
+      </div>
+    </div>
 
     <!-- Panel dentro de una trampilla (solo el impostor) -->
     <div id="vent-panel" class="card vent-panel hidden">

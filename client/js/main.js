@@ -1,6 +1,6 @@
 // Arranque del cliente y bucle principal.
 
-import { state, playerInfo, amAlive, phase } from './state.js';
+import { state, playerInfo, amAlive, phase, wifiDown } from './state.js';
 import * as net from './network.js';
 import * as ui from './ui.js';
 import { initInput, setActionHandler } from './input.js';
@@ -13,11 +13,12 @@ import { bindMeeting, isMeetingOpen, updateMeeting } from './meeting.js';
 import { bindEnd } from './endscreen.js';
 import { bindMinimap, toggleMinimap, updateMinimap } from './minimap.js';
 import { bindVentPanel } from './ventui.js';
+import { bindSabotage, openMenu, pendingFixPoints, updateSabotage } from './sabotageui.js';
 import { act, holdProgress, pendingTasks, updateActions } from './actions.js';
 import './match.js';
 import { MAP } from './map.js';
 import { STATIONS } from './places.js';
-import { SEND_RATE_MS, VISION_CREW, VISION_IMPOSTOR } from '../../shared/constants.js';
+import { LIGHTS_VISION, SEND_RATE_MS, VISION_CREW, VISION_IMPOSTOR } from '../../shared/constants.js';
 
 const MAX_DT = 0.1; // s; evita saltos si la pestaña estuvo parada
 const FONT_TIMEOUT_MS = 1500;
@@ -50,12 +51,15 @@ function characters() {
 // Radio de visión: los fantasmas lo ven todo y el impostor ve más lejos.
 function visionRadius() {
   if (!amAlive()) return Infinity;
-  return state.role === 'impostor' ? VISION_IMPOSTOR : VISION_CREW;
+  if (state.role === 'impostor') return VISION_IMPOSTOR;
+  return state.sabotage?.kind === 'luces' ? LIGHTS_VISION : VISION_CREW;
 }
 
 function gameView() {
   const bodies = state.bodies.map((b) => ({ ...b, lang: playerInfo(b.id)?.lang }));
-  const markers = phase() === 'playing' ? pendingTasks().map((t) => STATIONS[t.id]) : [];
+  const showTasks = phase() === 'playing' && !wifiDown();
+  const markers = showTasks ? pendingTasks().map((t) => STATIONS[t.id]) : [];
+  const alerts = amAlive() ? pendingFixPoints().map((p) => [p.x, p.y]) : [];
   return {
     cx: state.me.x,
     cy: state.me.y,
@@ -63,6 +67,7 @@ function gameView() {
     characters: characters(),
     bodies,
     markers,
+    alerts,
     ring: holdProgress(),
   };
 }
@@ -93,6 +98,7 @@ function frame(now) {
     updateActions();
     updateButtons();
     updateMeeting();
+    updateSabotage();
     sendPosition(now);
     render(gameView());
     updateMinimap(now);
@@ -106,7 +112,11 @@ function frame(now) {
 async function start() {
   initRender(document.getElementById('game'));
   initInput(ui.els.stick, ui.els.knob);
-  setActionHandler((name, down) => (name === 'map' ? down && toggleMinimap() : act(name, down)));
+  setActionHandler((name, down) => {
+    if (name === 'map') return down && toggleMinimap();
+    if (name === 'sabotage') return down && openMenu();
+    act(name, down);
+  });
   bindHome();
   bindLobby();
   bindHud();
@@ -114,6 +124,7 @@ async function start() {
   bindEnd();
   bindMinimap();
   bindVentPanel();
+  bindSabotage();
   tryResume();
   // Espera a la fuente para que los nombres del suelo salgan con Fredoka.
   const timeout = new Promise((r) => setTimeout(r, FONT_TIMEOUT_MS));

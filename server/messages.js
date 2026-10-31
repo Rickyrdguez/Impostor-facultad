@@ -6,6 +6,7 @@ import * as lobby from './lobby.js';
 import * as actions from './actions.js';
 import * as meeting from './meeting.js';
 import * as vents from './vents.js';
+import * as sabotage from './sabotage.js';
 import { MAX_MESSAGE_BYTES, MAX_MESSAGES_PER_SECOND } from './config.js';
 import { CHAT_MAX_LENGTH, NAME_MAX_LENGTH, ROOM_CODE_LENGTH } from '../shared/constants.js';
 
@@ -77,6 +78,14 @@ const handlers = {
   'vent-move': {
     valid: (m) => isShortString(m.to, ID_MAX_LENGTH),
     run: (ws, m) => rooms.dispatch(ws, vents.moveVent, { to: m.to }),
+  },
+  sabotage: {
+    valid: (m) => isShortString(m.kind, ID_MAX_LENGTH),
+    run: (ws, m) => rooms.dispatch(ws, sabotage.sabotage, { kind: m.kind }),
+  },
+  fix: {
+    valid: (m) => isShortString(m.point, ID_MAX_LENGTH),
+    run: (ws, m) => rooms.dispatch(ws, sabotage.fix, { point: m.point }),
   },
   vote: {
     valid: (m) => isShortString(m.target, ID_MAX_LENGTH),
