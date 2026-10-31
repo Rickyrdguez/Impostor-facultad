@@ -1,0 +1,303 @@
+/* Reunión (votación y chat) y pantalla final. */
+
+.meeting-card {
+  width: min(900px, 100%);
+  max-height: calc(100dvh - 32px);
+  display: flex;
+  flex-direction: column;
+  padding: 18px 20px;
+  gap: 14px;
+  animation: pop 0.3s ease-out;
+}
+
+.meeting-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 3px dashed var(--cream-2);
+  padding-bottom: 10px;
+}
+
+.meeting-head h2 {
+  margin: 0;
+  color: var(--brick);
+  font-size: 1.7rem;
+}
+
+.meeting-head p {
+  margin: 2px 0 0;
+  color: var(--ink-soft);
+}
+
+.timer {
+  flex: none;
+  min-width: 74px;
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  background: var(--blue);
+  border-radius: 14px;
+  padding: 6px 12px;
+}
+
+.timer.urgent {
+  background: var(--brick);
+  animation: pulse 0.8s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+.meeting-body {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 16px;
+  min-height: 0;
+  flex: 1;
+}
+
+.vote-area {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 0;
+}
+
+.vote-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 8px;
+  overflow-y: auto;
+}
+
+.vote-card {
+  font: inherit;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 14px;
+  border: 3px solid transparent;
+  background: #fff;
+  box-shadow: 0 2px 0 var(--cream-2);
+  text-align: left;
+  cursor: pointer;
+  min-height: 52px;
+}
+
+.vote-card:disabled {
+  cursor: default;
+}
+
+.vote-card.selected {
+  border-color: var(--wood);
+  background: #fff4e3;
+}
+
+.vote-card.dead {
+  opacity: 0.45;
+  text-decoration: line-through;
+}
+
+.vote-card .vote-name {
+  font-weight: 600;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.vote-card .voted-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #fff;
+  background: #3c9a4e;
+  border-radius: 8px;
+  padding: 2px 6px;
+}
+
+.vote-card.ejected {
+  border-color: var(--brick);
+  background: #ffe9e3;
+}
+
+.voter-dots {
+  position: absolute;
+  right: 8px;
+  bottom: -6px;
+  display: flex;
+  gap: 2px;
+}
+
+.voter-dots span {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+}
+
+.vote-status {
+  margin: 0;
+  font-weight: 600;
+  color: var(--ink);
+  min-height: 1.3em;
+}
+
+.vote-status.result {
+  font-size: 1.2rem;
+  color: var(--brick);
+}
+
+.vote-bar {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.chat {
+  display: flex;
+  flex-direction: column;
+  min-height: 220px;
+  background: var(--cream-2);
+  border-radius: 14px;
+  padding: 10px;
+  gap: 8px;
+}
+
+.chat-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  user-select: text;
+}
+
+.chat-list li {
+  background: #fff;
+  border-radius: 10px;
+  padding: 6px 9px;
+  font-size: 0.92rem;
+  overflow-wrap: anywhere;
+}
+
+.chat-list .chat-name {
+  font-weight: 700;
+  margin-right: 6px;
+}
+
+/* Punto del color del lenguaje delante del nombre */
+.chat-list .chat-name::before {
+  content: '';
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-right: 5px;
+  border-radius: 50%;
+  background: var(--dot);
+  box-shadow: 0 0 0 1.5px rgba(0, 0, 0, 0.25);
+}
+
+.chat-list li.system {
+  background: transparent;
+  color: var(--ink-soft);
+  font-style: italic;
+  text-align: center;
+}
+
+.chat-form {
+  display: flex;
+  gap: 6px;
+}
+
+.chat-form input {
+  padding: 0.45em 0.7em;
+  font-size: 0.95rem;
+}
+
+/* ---------- Pantalla final ---------- */
+
+.end-card {
+  width: min(460px, 100%);
+  padding: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: pop 0.35s ease-out;
+}
+
+.end-card h2 {
+  margin: 0;
+  font-size: 2.1rem;
+  color: var(--blue-dark);
+}
+
+.end-card.impostor-wins h2 {
+  color: var(--brick);
+}
+
+.end-card p {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.end-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.end-list li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border-radius: 12px;
+  padding: 6px 10px;
+}
+
+.end-list li span:nth-child(2) {
+  flex: 1;
+  font-weight: 600;
+}
+
+.end-list .tag.impostor {
+  background: var(--brick);
+  color: #fff;
+}
+
+/* ---------- Móvil ---------- */
+
+@media (max-width: 700px) {
+  .meeting-card {
+    padding: 12px;
+  }
+  .meeting-head h2 {
+    font-size: 1.25rem;
+  }
+  .meeting-body {
+    grid-template-columns: 1fr;
+    overflow-y: auto;
+  }
+  .vote-grid {
+    grid-template-columns: repeat(2, 1fr);
+    overflow: visible;
+  }
+  .chat {
+    min-height: 200px;
+  }
+}

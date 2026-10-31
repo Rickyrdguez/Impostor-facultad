@@ -19,13 +19,23 @@ Ingeniería y Tecnología (ULL). Se juega online desde cualquier red.
   `[{ to: 'all' | playerId, msg }]`. Los temporizadores se resuelven en
   `tick(room, now)`, que llama la capa de red cada `TICK_MS`. Así se podrá
   migrar a Cloudflare Workers + Durable Objects sin tocar las reglas.
+- Las reglas están repartidas en módulos puros: `game.js` (jugadores,
+  movimiento, tick, reconexión), `lobby.js` (lenguaje, empezar, volver a la
+  sala), `actions.js` (matar, reportar, tareas), `meeting.js` (chat, votos),
+  `victory.js` (victoria) e `info.js` (consultas y mensajes comunes).
+  Sin imports circulares.
+- Secretos: los roles solo van en el mensaje privado `role`; los vivos no
+  reciben la posición de los fantasmas (`tick` manda dos snapshots).
 - Red solo en `server/index.js` (http, ws, ping), `server/rooms.js` (salas,
   sockets, tokens, reconexión) y `server/messages.js` (parseo y validación).
 - Cliente: `main` (bucle), `network` (socket + reintentos), `session` (entrar, salir,
   reconectar), `input`, `state`, `players` (movimiento
   propio + interpolación), `render` (cámara, oscuridad), `mapview` (mapa
   pre-dibujado en un canvas aparte), `vision` (línea de visión por rayos, pura),
-  `furniture`, `characters`, `ui`, `palette`.
+  `furniture`, `characters`, `ui`, `palette`, `lobby` (selector de lenguaje),
+  `hud` (tareas, progreso, botones, banner), `actions` (E/Q/R), `markers`
+  (cuerpos, marcas, anillo), `meeting`, `endscreen`, `match` (mensajes de
+  la partida). CSS en `style.css`, `game.css` y `meeting.css`.
 - `client/js/map.js` es datos + colisiones puras (sin DOM). Lo importan el
   cliente y el servidor (el servidor valida movimiento y distancias).
 - `shared/constants.js`: lo que usan servidor y cliente (lenguajes, tareas,

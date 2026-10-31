@@ -4,6 +4,7 @@ import { state } from './state.js';
 import * as net from './network.js';
 import * as ui from './ui.js';
 import { clearKeys } from './input.js';
+import { forgetPhase } from './match.js';
 import { RECONNECT_GRACE_MS } from '../../shared/constants.js';
 
 const TOKEN_KEY = 'impostor-token'; // sessionStorage: uno por pestaña
@@ -41,6 +42,7 @@ function backToHome(message) {
   state.myId = null;
   state.room = null;
   state.others.clear();
+  forgetPhase();
   clearKeys();
   ui.setReconnecting(false);
   ui.showHome();

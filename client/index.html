@@ -10,6 +10,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="css/style.css" />
+    <link rel="stylesheet" href="css/game.css" />
+    <link rel="stylesheet" href="css/meeting.css" />
   </head>
   <body>
     <canvas id="game"></canvas>
@@ -39,17 +41,104 @@
       </div>
     </section>
 
-    <!-- Interfaz durante la partida -->
+    <!-- Interfaz durante la sala y la partida -->
     <section id="hud" class="hidden">
-      <div class="card room-card">
+      <div id="room-card" class="card room-card">
         <div class="room-head">
           <div class="room-code">Sala <strong id="room-code"></strong></div>
           <button id="btn-leave" class="btn small ghost">Salir</button>
         </div>
         <ul id="player-list"></ul>
-        <p class="hint">Muévete con <kbd>WASD</kbd> o las flechas</p>
+        <div id="lobby-controls" class="lobby-controls">
+          <button id="btn-lang" class="btn small secondary">Elegir lenguaje</button>
+          <button id="btn-start" class="btn primary">Empezar partida</button>
+          <p id="start-hint" class="hint"></p>
+        </div>
+      </div>
+
+      <div id="task-card" class="card task-card hidden">
+        <h3 id="task-title">Tareas</h3>
+        <ul id="task-list"></ul>
+      </div>
+
+      <div id="progress" class="progress hidden">
+        <span>Tareas del equipo</span>
+        <div class="progress-bar"><div id="progress-fill"></div></div>
+      </div>
+
+      <p id="ghost-note" class="ghost-note hidden">
+        Eres un fantasma: atraviesas paredes y puedes seguir con tus tareas.
+      </p>
+
+      <div id="actions" class="actions hidden">
+        <button id="act-report" class="act report" disabled>
+          <span class="act-label">Reportar</span><kbd>R</kbd>
+        </button>
+        <button id="act-kill" class="act kill" disabled>
+          <span id="kill-cd" class="act-cd"></span>
+          <span class="act-label">Matar</span><kbd>Q</kbd>
+        </button>
+        <button id="act-use" class="act use" disabled>
+          <span class="act-label">Usar</span><kbd>E</kbd>
+        </button>
       </div>
     </section>
+
+    <!-- Selector de lenguaje (sala de espera) -->
+    <div id="lang-picker" class="overlay hidden">
+      <div class="card picker-card">
+        <h2>Elige tu lenguaje</h2>
+        <div id="lang-grid" class="lang-grid"></div>
+        <button id="btn-picker-close" class="btn ghost">Cerrar</button>
+      </div>
+    </div>
+
+    <!-- Banner de rol al empezar -->
+    <div id="banner" class="banner hidden">
+      <div id="banner-title" class="banner-title"></div>
+      <div id="banner-sub" class="banner-sub"></div>
+    </div>
+
+    <!-- Reunión -->
+    <div id="meeting" class="overlay hidden">
+      <div class="card meeting-card">
+        <header class="meeting-head">
+          <div>
+            <h2 id="meeting-title"></h2>
+            <p id="meeting-sub"></p>
+          </div>
+          <div class="timer"><span id="meeting-time">0:40</span></div>
+        </header>
+        <div class="meeting-body">
+          <div class="vote-area">
+            <div id="vote-grid" class="vote-grid"></div>
+            <p id="vote-status" class="vote-status"></p>
+            <div id="vote-bar" class="vote-bar">
+              <button id="btn-skip" class="btn ghost">Saltar voto</button>
+              <button id="btn-vote" class="btn primary" disabled>Votar</button>
+            </div>
+          </div>
+          <div class="chat">
+            <ul id="chat-list" class="chat-list"></ul>
+            <form id="chat-form" class="chat-form">
+              <input id="chat-input" maxlength="120" autocomplete="off" placeholder="Escribe un mensaje…" />
+              <button class="btn secondary small" type="submit">Enviar</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pantalla final -->
+    <div id="end" class="overlay hidden">
+      <div class="card end-card">
+        <h2 id="end-title"></h2>
+        <p id="end-sub"></p>
+        <ul id="end-list" class="end-list"></ul>
+        <button id="btn-lobby" class="btn primary">Volver a la sala</button>
+        <p id="end-wait" class="hint">Esperando a que el anfitrión vuelva a la sala…</p>
+      </div>
+    </div>
 
     <div id="reconnecting" class="hidden" role="status">
       <span class="spinner" aria-hidden="true"></span>

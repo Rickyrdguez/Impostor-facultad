@@ -72,15 +72,40 @@ export const OBSTACLES = [
   { kind: 'mesa', rect: [1340, 1720, 120, 60] },
   { kind: 'mesa', rect: [1510, 1720, 120, 60] },
   { kind: 'armario', rect: [1660, 1800, 30, 140] },
+  { kind: 'maquina', rect: [1280, 1885, 70, 60] }, // fotocopiadora
   // Cafetería: lucernario central y mesas en anillo
   { kind: 'lucernario', circle: [800, 1700, 130] },
   ...ringTables(800, 1700, 275, 7),
+  { kind: 'maquina', rect: [1080, 1420, 50, 50] }, // máquina de café
   // Terraza
   { kind: 'maceta', circle: [420, 2255, 18] },
   { kind: 'maceta', circle: [620, 2255, 18] },
   { kind: 'maceta', circle: [1000, 2255, 18] },
   { kind: 'maceta', circle: [1300, 2255, 18] },
 ];
+
+// Estaciones de tareas: id de la tarea (shared/constants.js) -> [x, y].
+export const STATIONS = {
+  matricula: [310, 365],
+  certificado: [230, 230],
+  ventana: [900, 105],
+  maquina: [1605, 145],
+  sofa: [1290, 200],
+  tablon: [300, 665],
+  wifi: [1550, 665],
+  lavarse: [170, 1120],
+  papel: [245, 1265],
+  ascensor: [825, 1060],
+  proyector: [1525, 1210],
+  entregar: [1110, 1205],
+  compilar: [200, 1625],
+  osciloscopio: [200, 1885],
+  fotocopias: [1315, 1858],
+  libro: [1638, 1870],
+  cafe: [1078, 1495],
+  mesas: [800, 1960],
+  plantas: [620, 2220],
+};
 
 // Objetos altos que tapan la vista (el resto son bajos y se ve por encima).
 export const OPAQUE_KINDS = new Set(['armario', 'maquina', 'ascensor', 'columna', 'lucernario', 'mampara']);

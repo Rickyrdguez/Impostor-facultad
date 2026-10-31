@@ -90,7 +90,7 @@ export function resume(ws, token) {
   attach(ws, room, entry.id, token);
   send(ws, { t: 'welcome', id: entry.id, token, code: entry.code, resumed: true });
   deliver(room, game.setConnected(room.state, entry.id, true));
-  deliver(room, [{ to: entry.id, msg: game.roomInfo(room.state) }]);
+  deliver(room, game.rejoinState(room.state, entry.id, Date.now()));
 }
 
 // Saca del todo a un jugador de la sala.
@@ -98,7 +98,7 @@ function removePlayer(room, id) {
   room.sockets.delete(id);
   room.dropped.delete(id);
   for (const [token, entry] of tokens) if (entry.id === id) tokens.delete(token);
-  deliver(room, game.removePlayer(room.state, id));
+  deliver(room, game.removePlayer(room.state, id, Date.now()));
   if (game.playerCount(room.state) === 0) rooms.delete(room.state.code);
 }
 

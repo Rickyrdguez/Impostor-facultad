@@ -2,17 +2,29 @@
 
 import * as rooms from './rooms.js';
 import * as game from './game.js';
+import * as lobby from './lobby.js';
+import * as actions from './actions.js';
+import * as meeting from './meeting.js';
 import { MAX_MESSAGE_BYTES, MAX_MESSAGES_PER_SECOND } from './config.js';
-import { NAME_MAX_LENGTH, ROOM_CODE_LENGTH } from '../shared/constants.js';
+import { CHAT_MAX_LENGTH, NAME_MAX_LENGTH, ROOM_CODE_LENGTH } from '../shared/constants.js';
 
-// Limpia un nombre: sin caracteres de control, espacios simples, máx. 12.
-export function cleanName(raw) {
-  if (typeof raw !== 'string') return 'Anónimo';
-  const name = raw
-    .replace(/[\u0000-\u001f\u007f<>]/g, '')
+const TOKEN_MAX_LENGTH = 64;
+const ID_MAX_LENGTH = 16;
+const ENTRY_TYPES = new Set(['create', 'join', 'resume']); // mensajes para entrar en una sala
+
+// Quita caracteres de control y espacios repetidos, y recorta a max letras.
+function cleanText(raw, max) {
+  if (typeof raw !== 'string') return '';
+  const text = raw
+    .replace(/[\u0000-\u001f\u007f]/g, '')
     .replace(/\s+/g, ' ')
     .trim();
-  return [...name].slice(0, NAME_MAX_LENGTH).join('').trim() || 'Anónimo';
+  return [...text].slice(0, max).join('').trim();
+}
+
+// Nombres: además sin < ni >, máx. 12 letras.
+export function cleanName(raw) {
+  return cleanText(typeof raw === 'string' ? raw.replace(/[<>]/g, '') : '', NAME_MAX_LENGTH) || 'Anónimo';
 }
 
 function cleanCode(raw) {
@@ -20,15 +32,17 @@ function cleanCode(raw) {
   return raw.toUpperCase().replace(/[^A-Z]/g, '').slice(0, ROOM_CODE_LENGTH);
 }
 
-const TOKEN_MAX_LENGTH = 64;
-const ENTRY_TYPES = new Set(['create', 'join', 'resume']); // mensajes para entrar en una sala
+const isNum = (v) => typeof v === 'number' && Number.isFinite(v);
+const isShortString = (v, max) => typeof v === 'string' && v.length <= max;
+const always = () => true;
 
-const isNum =(v) => typeof v === 'number' && Number.isFinite(v);
+// Acción de juego sin datos extra: solo se pasa a la regla correspondiente.
+const simple = (rule) => ({ valid: always, run: (ws) => rooms.dispatch(ws, rule, {}) });
 
 // Cada tipo de mensaje: comprobación de formato + acción.
 const handlers = {
   create: {
-    valid: () => true,
+    valid: always,
     run: (ws, m) => rooms.createRoom(ws, cleanName(m.name)),
   },
   join: {
@@ -36,16 +50,34 @@ const handlers = {
     run: (ws, m) => rooms.joinRoom(ws, cleanCode(m.code), cleanName(m.name)),
   },
   resume: {
-    valid: (m) => typeof m.token === 'string' && m.token.length <= TOKEN_MAX_LENGTH,
+    valid: (m) => isShortString(m.token, TOKEN_MAX_LENGTH),
     run: (ws, m) => rooms.resume(ws, m.token),
   },
   leave: {
-    valid: () => true,
+    valid: always,
     run: (ws) => rooms.leave(ws),
   },
   move: {
     valid: (m) => isNum(m.x) && isNum(m.y),
     run: (ws, m) => rooms.dispatch(ws, game.handleMove, { x: m.x, y: m.y }),
+  },
+  lang: {
+    valid: (m) => isShortString(m.lang, ID_MAX_LENGTH),
+    run: (ws, m) => rooms.dispatch(ws, lobby.chooseLanguage, { lang: m.lang }),
+  },
+  start: simple(lobby.startGame),
+  lobby: simple(lobby.returnToLobby),
+  kill: simple(actions.kill),
+  report: simple(actions.report),
+  'task-start': simple(actions.taskStart),
+  'task-done': simple(actions.taskDone),
+  vote: {
+    valid: (m) => isShortString(m.target, ID_MAX_LENGTH),
+    run: (ws, m) => rooms.dispatch(ws, meeting.vote, { target: m.target }),
+  },
+  chat: {
+    valid: (m) => typeof m.text === 'string',
+    run: (ws, m) => rooms.dispatch(ws, meeting.chat, { text: cleanText(m.text, CHAT_MAX_LENGTH) }),
   },
 };
 

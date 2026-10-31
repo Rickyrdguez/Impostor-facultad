@@ -20,6 +20,7 @@ export const els = {
   homeError: $('home-error'),
   roomCode: $('room-code'),
   playerList: $('player-list'),
+  roomCard: $('room-card'),
   touchZone: $('touch-zone'),
   stick: $('stick'),
   knob: $('knob'),
@@ -61,7 +62,7 @@ export function toast(text) {
   toastTimer = setTimeout(() => els.toast.classList.add('hidden'), TOAST_MS);
 }
 
-function langDot(langId) {
+export function langDot(langId) {
   const lang = languageById(langId);
   const dot = document.createElement('span');
   dot.className = 'lang-dot';
@@ -71,7 +72,7 @@ function langDot(langId) {
   return dot;
 }
 
-function tag(text, extra = '') {
+export function tag(text, extra = '') {
   const t = document.createElement('span');
   t.className = `tag ${extra}`;
   t.textContent = text;
@@ -88,9 +89,13 @@ export function renderRoom(room, myId) {
     li.append(langDot(p.lang), name);
     if (p.id === room.hostId) li.append(tag('anfitrión', 'host'));
     if (p.id === myId) li.append(tag('tú'));
+    if (!p.connected) li.append(tag('sin conexión'));
+    if (!p.connected) li.classList.add('offline');
     return li;
   });
   els.playerList.replaceChildren(...items);
+  // Durante la partida la tarjeta se queda pequeña (solo el código y Salir).
+  els.roomCard.classList.toggle('compact', room.phase !== 'lobby');
 }
 
 // Personaje de ejemplo en la tarjeta de inicio.

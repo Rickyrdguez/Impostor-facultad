@@ -4,10 +4,9 @@ Juego multijugador por navegador tipo "impostor", ambientado en la Escuela
 Superior de Ingeniería y Tecnología (Universidad de La Laguna). Cada jugador
 es un lenguaje de programación con birrete; uno de ellos es el impostor.
 
-> Proyecto en desarrollo por fases. Ahora mismo (fase 2): salas con código,
-> movimiento por el mapa de la facultad con colisiones, varios jugadores
-> viéndose entre sí, visión dinámica (las paredes tapan la vista) y juego
-> online desde cualquier red con reconexión automática.
+> Proyecto en desarrollo por fases. Ya se puede jugar una partida completa:
+> lenguajes, roles, tareas, muertes, reuniones con chat y votación, y
+> pantalla final. Falta el pulido (sonidos, animaciones, ajustes de móvil).
 
 ## Ejecutar en local
 
@@ -92,6 +91,25 @@ también recupera la partida (dentro de esos 30 s y en la misma pestaña).
 | Acción | Teclado | Móvil |
 | --- | --- | --- |
 | Moverse | WASD o flechas | Joystick (toca la mitad izquierda) |
+| Hacer una tarea | Mantener E cerca de la estación | Mantener **Usar** |
+| Matar (impostor) | Q | **Matar** |
+| Reportar un cuerpo | R | **Reportar** |
+
+## Cómo se juega
+
+- Entre 3 y 10 jugadores. El anfitrión crea la sala y pasa el código; cada
+  uno elige su lenguaje en **Elegir lenguaje** y el anfitrión pulsa **Empezar**.
+- Hay un impostor. Los demás son tripulantes y tienen 3 tareas repartidas por
+  la facultad (las marca una flecha amarilla). Si el equipo completa todas,
+  ganan los tripulantes.
+- El impostor mata con Q (cada 15 s) y deja un cuerpo. Quien lo encuentre lo
+  reporta con R y empieza una reunión: 40 s para hablar por chat y votar.
+  El más votado sale expulsado (con empate, nadie).
+- Ganan los tripulantes si expulsan al impostor o terminan las tareas. Gana
+  el impostor si quedan tantos impostores como tripulantes.
+- Los muertos son fantasmas: atraviesan paredes, lo ven todo y, si eran
+  tripulantes, pueden seguir haciendo tareas.
+- Para probar con dos pestañas, baja `MIN_PLAYERS` en `server/config.js`.
 
 ## Tests
 

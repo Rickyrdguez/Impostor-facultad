@@ -102,6 +102,15 @@ function drawPatio(ctx, [x, y, w, h]) {
   drawPlant(ctx, [x + 60, y + h - 80, 18]);
 }
 
+// Estación de tarea: un pequeño panel con pantalla azul en el suelo.
+export function drawStation(ctx, [x, y]) {
+  drawBox(ctx, [x - 13, y - 11, 26, 22], [PALETTE.metal, PALETTE.metalDark, '#e4e6e8']);
+  ctx.fillStyle = PALETTE.blueLight;
+  ctx.fillRect(x - 8, y - 6, 16, 8);
+  ctx.fillStyle = '#e8f4ff';
+  ctx.fillRect(x - 6, y - 4, 5, 2);
+}
+
 export function drawObstacle(ctx, o) {
   if (o.kind === 'patio') return drawPatio(ctx, o.rect);
   if (o.kind === 'lucernario') return drawSkylight(ctx, o.circle);

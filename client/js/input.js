@@ -1,6 +1,8 @@
 // Entrada: teclado (WASD / flechas) y joystick táctil.
 
 const keys = new Set();
+const ACTION_KEYS = { KeyE: 'use', KeyQ: 'kill', KeyR: 'report' };
+let onAction = () => {};
 const stick = { active: false, id: null, ox: 0, oy: 0, dx: 0, dy: 0 };
 const STICK_RADIUS = 50; // px de pantalla
 
@@ -21,8 +23,12 @@ export function initInput(stickEl, knobEl) {
     if (typingInField(e)) return;
     keys.add(e.code);
     if (DIRS[e.code]) e.preventDefault();
+    if (ACTION_KEYS[e.code] && !e.repeat) onAction(ACTION_KEYS[e.code], true);
   });
-  addEventListener('keyup', (e) => keys.delete(e.code));
+  addEventListener('keyup', (e) => {
+    keys.delete(e.code);
+    if (ACTION_KEYS[e.code]) onAction(ACTION_KEYS[e.code], false);
+  });
   addEventListener('blur', () => keys.clear());
   initStick(stickEl, knobEl);
 }
@@ -76,6 +82,11 @@ export function moveVector() {
   }
   const len = Math.hypot(x, y);
   return len > 1 ? { x: x / len, y: y / len } : { x, y };
+}
+
+// Registra quién atiende las teclas de acción: fn(nombre, pulsada).
+export function setActionHandler(fn) {
+  onAction = fn;
 }
 
 export function clearKeys() {

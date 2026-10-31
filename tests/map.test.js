@@ -2,8 +2,8 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { MAP, ROOMS, canStand, spawnPoint } from '../client/js/map.js';
-import { PLAYER_RADIUS } from '../shared/constants.js';
+import { MAP, ROOMS, STATIONS, canStand, spawnPoint } from '../client/js/map.js';
+import { PLAYER_RADIUS, TASKS, USE_RANGE } from '../shared/constants.js';
 import { MAX_PLAYERS } from '../server/config.js';
 
 const GRID = 10;
@@ -57,4 +57,14 @@ test('no se puede estar dentro de una pared', () => {
   assert.equal(canStand(660, 400, PLAYER_RADIUS), false); // entre secretaría y patio
   assert.equal(canStand(900, 400, PLAYER_RADIUS), false); // patio
   assert.equal(canStand(900, 400, PLAYER_RADIUS, true), true); // fantasma sí
+});
+
+test('cada tarea tiene una estación alcanzable', () => {
+  const cells = [...reachableCells()].map((k) => k.split(',').map((v) => v * GRID));
+  for (const task of TASKS) {
+    assert.ok(STATIONS[task.id], `${task.id} no tiene estación`);
+    const [sx, sy] = STATIONS[task.id];
+    const ok = cells.some(([x, y]) => Math.hypot(x - sx, y - sy) <= USE_RANGE * 0.7);
+    assert.ok(ok, `no se llega a la estación de ${task.id}`);
+  }
 });

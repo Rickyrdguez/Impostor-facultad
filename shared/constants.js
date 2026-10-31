@@ -15,6 +15,40 @@ export const RECONNECT_GRACE_MS = 30000; // tiempo para volver tras una caída
 export const VISION_CREW = 300;
 export const VISION_IMPOSTOR = 400;
 
+// Acciones (distancias en unidades del mundo, tiempos en ms)
+export const USE_RANGE = 80; // distancia para hacer una tarea
+export const KILL_RANGE = 90; // distancia para matar
+export const REPORT_RANGE = 110; // distancia para reportar un cuerpo
+export const TASK_HOLD_MS = 1200; // mantener E para completar una tarea
+export const CHAT_MAX_LENGTH = 120;
+
+// Tareas: nombre que ve el jugador. Su estación está en client/js/map.js.
+export const TASKS = [
+  { id: 'matricula', name: 'Sellar la matrícula', room: 'Secretaría' },
+  { id: 'certificado', name: 'Pedir un certificado', room: 'Secretaría' },
+  { id: 'ventana', name: 'Cerrar la ventana', room: 'Pasarela' },
+  { id: 'maquina', name: 'Sacar algo de la máquina', room: 'Zona relax' },
+  { id: 'sofa', name: 'Despertar al del sofá', room: 'Zona relax' },
+  { id: 'tablon', name: 'Mirar las notas del tablón', room: 'Gran pasillo' },
+  { id: 'wifi', name: 'Reiniciar el wifi', room: 'Gran pasillo' },
+  { id: 'lavarse', name: 'Lavarse las manos', room: 'Baños' },
+  { id: 'papel', name: 'Reponer el papel', room: 'Baños' },
+  { id: 'ascensor', name: 'Llamar al ascensor', room: 'Ascensor' },
+  { id: 'proyector', name: 'Arreglar el proyector', room: 'Clase' },
+  { id: 'entregar', name: 'Entregar la práctica', room: 'Clase' },
+  { id: 'compilar', name: 'Compilar el proyecto', room: 'Laboratorio' },
+  { id: 'osciloscopio', name: 'Calibrar el osciloscopio', room: 'Laboratorio' },
+  { id: 'fotocopias', name: 'Fotocopiar apuntes', room: 'Sala de estudio' },
+  { id: 'libro', name: 'Buscar un libro', room: 'Sala de estudio' },
+  { id: 'cafe', name: 'Pedir un café', room: 'Cafetería' },
+  { id: 'mesas', name: 'Limpiar las mesas', room: 'Cafetería' },
+  { id: 'plantas', name: 'Regar las plantas', room: 'Terraza' },
+];
+
+export function taskById(id) {
+  return TASKS.find((t) => t.id === id);
+}
+
 // Lenguajes elegibles como personaje: color característico + letras.
 // ink = color de las letras de la insignia para que se lean bien.
 export const LANGUAGES = [

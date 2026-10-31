@@ -3,6 +3,7 @@
 import { MAP } from './map.js';
 import { buildMapCanvas } from './mapview.js';
 import { drawCharacter } from './characters.js';
+import { drawCorpse, drawTaskMarker, drawTaskRing } from './markers.js';
 import { PALETTE } from './palette.js';
 import { buildVisionGrid, visibilityPolygon, canSee } from './vision.js';
 import { PLAYER_RADIUS } from '../../shared/constants.js';
@@ -86,7 +87,12 @@ function isVisible(c, view) {
   );
 }
 
-// view: { cx, cy, vision (radio o Infinity si no hay niebla), characters: [...] }
+// view: {
+//   cx, cy: centro de la cámara (el jugador)
+//   vision: radio de visión, o Infinity si no hay niebla (fantasmas, inicio)
+//   characters: personajes a dibujar   bodies: cuerpos [{ x, y, lang }]
+//   markers: estaciones de mis tareas [[x, y]]   ring: progreso de la tarea (0-1) o null
+// }
 export function render(view) {
   const s = cameraScale();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -97,8 +103,15 @@ export function render(view) {
   ctx.setTransform(...transform);
   if (mapCanvas) ctx.drawImage(mapCanvas, 0, 0, MAP.width, MAP.height);
 
+  for (const b of (view.bodies || []).filter((b) => isVisible(b, view))) drawCorpse(ctx, b, b.lang);
   const visible = view.characters.filter((c) => isVisible(c, view)).sort((a, b) => a.y - b.y);
   for (const c of visible) drawCharacter(ctx, c);
+  if (view.ring !== null && view.ring !== undefined) drawTaskRing(ctx, view.cx, view.cy, view.ring);
 
   if (Number.isFinite(view.vision) && mapCanvas) drawFog(view, transform);
+
+  // Las marcas de tareas se ven siempre, por encima de la niebla, para orientarse.
+  ctx.setTransform(...transform);
+  const now = performance.now();
+  for (const [x, y] of view.markers || []) drawTaskMarker(ctx, x, y, now);
 }
