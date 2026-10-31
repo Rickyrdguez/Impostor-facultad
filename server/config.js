@@ -1,9 +1,10 @@
 // Constantes del servidor. Lógica pura: no depende de Node ni de ws.
 
+import { defaultSettings } from '../shared/settings.js';
+
 export {
   RECONNECT_GRACE_MS,
   USE_RANGE,
-  KILL_RANGE,
   REPORT_RANGE,
   TASK_MIN_MS,
   CHAT_MAX_LENGTH,
@@ -12,15 +13,15 @@ export {
 export const TICK_MS = 50; // reparto del estado (20 veces/s)
 export const MIN_PLAYERS = 3; // bájalo a 2 para probar con dos pestañas
 export const MAX_PLAYERS = 10;
-export const IMPOSTORS = 1;
 
-// Reglas de la partida
-export const TASKS_PER_PLAYER = 3;
-export const KILL_COOLDOWN_MS = 15000;
-export const EMERGENCY_COOLDOWN_MS = 15000; // tras empezar y tras cada reunión
+// Reglas de la partida. Las que se pueden ajustar en la sala están en
+// shared/settings.js; aquí se exportan sus valores por defecto (los usan los tests).
+const DEFAULTS = defaultSettings();
+export const KILL_COOLDOWN_MS = DEFAULTS.killCooldown * 1000;
+export const EMERGENCY_COOLDOWN_MS = DEFAULTS.emergencyCooldown * 1000;
+export const MEETING_MS = DEFAULTS.meetingTime * 1000;
 export const SABOTAGE_COOLDOWN_MS = 30000; // entre sabotajes (y al empezar)
 export const RADON_MS = 45000; // tiempo para cerrar la fuga de radón antes de perder
-export const MEETING_MS = 40000; // tiempo para hablar y votar
 export const RESULT_MS = 8000; // recuento + animación de expulsión
 export const CHAT_COOLDOWN_MS = 700; // entre dos mensajes del mismo jugador
 

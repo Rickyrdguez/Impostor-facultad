@@ -17,7 +17,6 @@ export const VISION_IMPOSTOR = 400;
 
 // Acciones (distancias en unidades del mundo, tiempos en ms)
 export const USE_RANGE = 80; // distancia para hacer una tarea
-export const KILL_RANGE = 90; // distancia para matar
 export const REPORT_RANGE = 110; // distancia para reportar un cuerpo
 export const TASK_MIN_MS = 500; // tiempo mínimo entre abrir y terminar un minijuego
 export const CHAT_MAX_LENGTH = 120;

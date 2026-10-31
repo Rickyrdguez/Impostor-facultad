@@ -7,6 +7,7 @@ import * as actions from './actions.js';
 import * as meeting from './meeting.js';
 import * as vents from './vents.js';
 import * as sabotage from './sabotage.js';
+import * as settings from './settings.js';
 import { MAX_MESSAGE_BYTES, MAX_MESSAGES_PER_SECOND } from './config.js';
 import { CHAT_MAX_LENGTH, NAME_MAX_LENGTH, ROOM_CODE_LENGTH } from '../shared/constants.js';
 
@@ -68,6 +69,10 @@ const handlers = {
     run: (ws, m) => rooms.dispatch(ws, lobby.chooseLanguage, { lang: m.lang }),
   },
   start: simple(lobby.startGame),
+  setting: {
+    valid: (m) => isShortString(m.id, ID_MAX_LENGTH),
+    run: (ws, m) => rooms.dispatch(ws, settings.changeSetting, { id: m.id, value: m.value }),
+  },
   lobby: simple(lobby.returnToLobby),
   kill: simple(actions.kill),
   report: simple(actions.report),

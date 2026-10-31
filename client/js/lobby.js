@@ -4,6 +4,7 @@ import { state, isHost, phase } from './state.js';
 import * as net from './network.js';
 import { LANGUAGES } from '../../shared/constants.js';
 import { langDot } from './ui.js';
+import { renderSettings, settingsSummary, openSettings } from './settingsui.js';
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -11,6 +12,7 @@ const els = {
   langBtn: $('btn-lang'),
   start: $('btn-start'),
   hint: $('start-hint'),
+  summary: $('settings-summary'),
   picker: $('lang-picker'),
   grid: $('lang-grid'),
   close: $('btn-picker-close'),
@@ -55,8 +57,13 @@ function renderPicker() {
 export function renderLobby() {
   const inLobby = phase() === 'lobby';
   els.controls.classList.toggle('hidden', !inLobby);
-  if (!inLobby) return openPicker(false);
+  if (!inLobby) {
+    openSettings(false);
+    return openPicker(false);
+  }
   if (!els.picker.classList.contains('hidden')) renderPicker();
+  renderSettings();
+  els.summary.textContent = settingsSummary(state.room.settings);
 
   const count = state.room.players.length;
   const missing = state.room.minPlayers - count;

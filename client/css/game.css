@@ -572,3 +572,73 @@
     top: calc(max(12px, env(safe-area-inset-top)) + 100px);
   }
 }
+
+/* ---------- Ajustes de la partida ---------- */
+
+.settings-card {
+  width: min(520px, 100%);
+  max-height: calc(100dvh - 32px);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  animation: pop 0.25s ease-out;
+}
+
+.settings-card h2 {
+  margin: 0;
+  text-align: center;
+  color: var(--brick);
+}
+
+.settings-card .hint {
+  margin: 0;
+  text-align: center;
+}
+
+.settings-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.settings-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: #fff;
+  font-size: 0.92rem;
+}
+
+.setting-control {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+.setting-control strong {
+  min-width: 64px;
+  text-align: center;
+}
+
+.setting-step {
+  width: 34px;
+  padding: 0.3em 0;
+}
+
+.setting-step:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.setting-toggle {
+  min-width: 64px;
+}

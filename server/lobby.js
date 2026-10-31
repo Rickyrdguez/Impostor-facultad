@@ -2,14 +2,8 @@
 
 import { LANGUAGES, TASKS } from '../shared/constants.js';
 import { spawnPoint } from '../client/js/map.js';
-import {
-  EMERGENCY_COOLDOWN_MS,
-  IMPOSTORS,
-  KILL_COOLDOWN_MS,
-  MAX_PLAYERS,
-  MIN_PLAYERS,
-  TASKS_PER_PLAYER,
-} from './config.js';
+import { MAX_PLAYERS, MIN_PLAYERS } from './config.js';
+import { emergencyCooldownMs, killCooldownMs } from './settings.js';
 import { playerList, roomInfo, taskProgress, tasksMessage, toAll } from './info.js';
 import { resetSabotage, sabotageMessage } from './sabotage.js';
 
@@ -49,14 +43,14 @@ export function chooseLanguage(room, id, msg) {
   return [toAll(roomInfo(room))];
 }
 
-// Nunca más impostores que la mitad de los tripulantes.
-function impostorCount(players) {
-  return Math.max(1, Math.min(IMPOSTORS, Math.floor((players - 1) / 2)));
+// Los que pida el anfitrión, pero nunca tantos como tripulantes.
+function impostorCount(players, wanted) {
+  return Math.max(1, Math.min(wanted, Math.floor((players - 1) / 2)));
 }
 
-function randomTasks() {
+function randomTasks(count) {
   return shuffle(TASKS)
-    .slice(0, TASKS_PER_PLAYER)
+    .slice(0, count)
     .map((t) => ({ id: t.id, done: false }));
 }
 
@@ -75,18 +69,19 @@ export function startGame(room, id, msg, now) {
   if (players.length < MIN_PLAYERS) {
     return [error(id, `Hacen falta al menos ${MIN_PLAYERS} jugadores.`)];
   }
-  const impostors = new Set(shuffle(players).slice(0, impostorCount(players.length)));
+  const { settings } = room;
+  const impostors = new Set(shuffle(players).slice(0, impostorCount(players.length, settings.impostors)));
   for (const p of players) {
     p.role = impostors.has(p) ? 'impostor' : 'crew';
     p.alive = true;
-    p.tasks = randomTasks();
+    p.tasks = randomTasks(settings.tasks);
     p.taskStart = null;
-    p.killReadyAt = now + KILL_COOLDOWN_MS;
-    p.emergencyUsed = false;
+    p.killReadyAt = now + killCooldownMs(room);
+    p.emergencyLeft = settings.emergencyMeetings;
     p.vent = null;
   }
   room.phase = 'playing';
-  room.emergencyReadyAt = now + EMERGENCY_COOLDOWN_MS;
+  room.emergencyReadyAt = now + emergencyCooldownMs(room);
   room.bodies = [];
   room.meeting = null;
   const out = [
@@ -98,7 +93,7 @@ export function startGame(room, id, msg, now) {
   ];
   for (const p of players) {
     out.push({ to: p.id, msg: roleMessage(room, p) }, { to: p.id, msg: tasksMessage(p) });
-    if (p.role === 'impostor') out.push({ to: p.id, msg: { t: 'cooldown', ms: KILL_COOLDOWN_MS } });
+    if (p.role === 'impostor') out.push({ to: p.id, msg: { t: 'cooldown', ms: killCooldownMs(room) } });
   }
   return [...out, ...sendAllToSpawn(room, now)];
 }
@@ -111,6 +106,7 @@ export function backToLobby(room, now) {
     p.tasks = [];
     p.taskStart = null;
     p.vent = null;
+    p.emergencyLeft = undefined;
   }
   room.phase = 'lobby';
   room.bodies = [];

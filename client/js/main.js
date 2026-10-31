@@ -16,6 +16,7 @@ import { bindVentPanel, updateVentInput, ventArrows } from './ventui.js';
 import { bindSabotage, openMenu, pendingFixPoints, updateSabotage } from './sabotageui.js';
 import { act, pendingTasks } from './actions.js';
 import { bindMinigames, isMinigameOpen } from './minigames/index.js';
+import { bindSettings } from './settingsui.js';
 import './match.js';
 import { MAP } from './map.js';
 import { STATIONS } from './places.js';
@@ -52,8 +53,9 @@ function characters() {
 // Radio de visión: los fantasmas lo ven todo y el impostor ve más lejos.
 function visionRadius() {
   if (!amAlive()) return Infinity;
-  if (state.role === 'impostor') return VISION_IMPOSTOR;
-  return state.sabotage?.kind === 'luces' ? LIGHTS_VISION : VISION_CREW;
+  const { crewVision, impostorVision } = state.room.settings;
+  if (state.role === 'impostor') return VISION_IMPOSTOR * impostorVision;
+  return state.sabotage?.kind === 'luces' ? LIGHTS_VISION : VISION_CREW * crewVision;
 }
 
 function gameView() {
@@ -127,6 +129,7 @@ async function start() {
   bindVentPanel(document.getElementById('game'));
   bindSabotage();
   bindMinigames();
+  bindSettings();
   ui.bindSoundButton();
   tryResume();
   // Espera a la fuente para que los nombres del suelo salgan con Fredoka.

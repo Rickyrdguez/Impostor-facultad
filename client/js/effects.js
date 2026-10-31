@@ -7,7 +7,8 @@ import { play } from './sound.js';
 const DEATH_MS = 2600;
 const SPLASH_MS = 1400;
 const EJECT_FLIGHT_MS = 4200;
-const TYPE_MS = 45; // velocidad del texto que se escribe solo
+const TYPE_MS = 40; // velocidad del texto que se escribe solo
+const LINE_PAUSE_MS = 250; // pausa entre líneas de la terminal
 const CANVAS_SCALE = 5; // el personaje ocupa casi todo el canvas
 
 const $ = (id) => document.getElementById(id);
@@ -21,6 +22,8 @@ const els = {
   ejectCanvas: $('eject-canvas'),
   ejectText: $('eject-text'),
   ejectSub: $('eject-sub'),
+  ejectCmd: $('eject-cmd'),
+  ejectExtra: $('eject-extra'),
 };
 const timers = {};
 
@@ -59,23 +62,34 @@ export function showSplash(text) {
 
 export const SPLASH_DELAY_MS = SPLASH_MS;
 
-// Texto que se va escribiendo letra a letra.
-function typeText(node, text) {
+// Texto que se va escribiendo letra a letra; al acabar llama a done.
+function typeText(node, text, done = () => {}) {
   node.textContent = '';
   let i = 0;
   clearInterval(timers.type);
   timers.type = setInterval(() => {
     node.textContent = text.slice(0, ++i);
-    if (i >= text.length) clearInterval(timers.type);
+    if (i < text.length) return;
+    clearInterval(timers.type);
+    done();
   }, TYPE_MS);
 }
 
-// Expulsión: el personaje sale volando por la pantalla y se dice si era el impostor.
-export function showEjection(text, sub, langId) {
+// Expulsión: el personaje sale volando mientras en la terminal se teclea el rm -rf.
+// lines: { cmd, title, sub, extra }
+export function showEjection(lines, langId) {
   els.eject.classList.remove('hidden');
-  els.ejectSub.textContent = '';
-  typeText(els.ejectText, text);
-  later('ejectSub', () => (els.ejectSub.textContent = sub), text.length * TYPE_MS + 400);
+  for (const node of [els.ejectCmd, els.ejectText, els.ejectSub, els.ejectExtra]) node.textContent = '';
+  typeText(els.ejectCmd, lines.cmd, () =>
+    later('ejectTitle', () => {
+      typeText(els.ejectText, lines.title, () => {
+        later('ejectSub', () => {
+          els.ejectSub.textContent = lines.sub;
+          els.ejectExtra.textContent = lines.extra;
+        }, LINE_PAUSE_MS);
+      });
+    }, LINE_PAUSE_MS),
+  );
   els.ejectCanvas.classList.toggle('hidden', !langId);
   if (langId) {
     portrait(els.ejectCanvas, langId);

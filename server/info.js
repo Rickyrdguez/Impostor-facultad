@@ -24,7 +24,7 @@ export function roomInfo(room) {
     lang: p.lang,
     alive: p.alive,
     connected: p.connected,
-    buttonUsed: Boolean(p.emergencyUsed),
+    buttonsLeft: p.emergencyLeft ?? room.settings.emergencyMeetings,
   }));
   return {
     t: 'room',
@@ -32,6 +32,7 @@ export function roomInfo(room) {
     hostId: room.hostId,
     phase: room.phase,
     minPlayers: MIN_PLAYERS,
+    settings: room.settings,
     players,
   };
 }

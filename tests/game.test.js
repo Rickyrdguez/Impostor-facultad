@@ -180,7 +180,7 @@ test('botón de emergencia: una vez por jugador y con enfriamiento', async () =>
   assert.equal(room.phase, 'playing');
   Object.assign(p, { x: EMERGENCY.x + 50, y: EMERGENCY.y });
   const again = actions.emergency(room, p.id, {}, T0 + 10 * EMERGENCY_COOLDOWN_MS);
-  assert.match(msgs(again, 'notice')[0].msg.text, /Ya has usado/);
+  assert.match(msgs(again, 'notice')[0].msg.text, /Ya no te quedan/);
 });
 
 test('trampillas: solo el impostor, invisible dentro y salto a las conectadas', async () => {

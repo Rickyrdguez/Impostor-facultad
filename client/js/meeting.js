@@ -114,18 +114,46 @@ export function onResult(msg) {
   m.result = msg;
   m.endsAt = performance.now() + msg.ms;
   render();
-  const ejected = msg.ejected ? playerInfo(msg.ejected) : null;
-  const title = resultText(msg).split('. ')[0] + '.';
-  const sub = !ejected ? '' : msg.wasImpostor ? 'Era el impostor.' : 'No era el impostor.';
-  setTimeout(() => m && m.result === msg && showEjection(title, sub, ejected?.lang), EJECT_DELAY_MS);
+  const lines = ejectionLines(msg);
+  const lang = msg.ejected ? playerInfo(msg.ejected)?.lang : null;
+  setTimeout(() => m && m.result === msg && showEjection(lines, lang), EJECT_DELAY_MS);
+}
+
+// Nombre convertido en ruta de carpeta: "Ana María" -> "ana_maría".
+const folder = (name) => name.toLowerCase().replace(/\s+/g, '_');
+
+function impostorsLeftText(n) {
+  if (n === null || n === undefined) return '';
+  if (n === 0) return 'No queda ningún impostor.';
+  return n === 1 ? 'Queda 1 impostor.' : `Quedan ${n} impostores.`;
+}
+
+// Textos de la expulsión: comando, frase principal y si era el impostor.
+function ejectionLines(r) {
+  if (!r.ejected) {
+    const skipped = Object.values(r.votes).filter((v) => v === 'skip').length;
+    return {
+      cmd: '$ sudo rm -rf ~/???',
+      title: 'Nadie ha recibido el rm -rf.',
+      sub: skipped ? 'Se saltó la votación.' : 'Hubo empate.',
+      extra: '',
+    };
+  }
+  const name = nameOf(r.ejected);
+  let sub = '';
+  if (r.wasImpostor === true) sub = 'Era el impostor.';
+  if (r.wasImpostor === false) sub = 'No era el impostor.';
+  return {
+    cmd: `$ sudo rm -rf ~/${folder(name)}`,
+    title: `Le habéis aplicado rm -rf a ${name}.`,
+    sub,
+    extra: impostorsLeftText(r.impostorsLeft),
+  };
 }
 
 function resultText(r) {
-  if (!r.ejected) {
-    const skipped = Object.values(r.votes).filter((v) => v === 'skip').length;
-    return skipped ? 'Nadie ha sido expulsado (se saltó la votación).' : 'Nadie ha sido expulsado (empate).';
-  }
-  return `Habéis expulsado a ${nameOf(r.ejected)}. ${r.wasImpostor ? 'Era el impostor.' : 'No era el impostor.'}`;
+  const { title, sub } = ejectionLines(r);
+  return sub ? `${title} ${sub}` : title;
 }
 
 // Tarjeta de un jugador: clic para seleccionarlo; tras el recuento, quién le votó.
@@ -163,7 +191,8 @@ function addVoterDots(btn, targetId) {
   for (const [voter, target] of Object.entries(m.result.votes)) {
     if (target !== targetId) continue;
     const dot = document.createElement('span');
-    dot.style.background = languageById(playerInfo(voter)?.lang).color;
+    const info = playerInfo(voter); // con votos anónimos no se sabe quién votó
+    dot.style.background = info ? languageById(info.lang).color : '#9a958c';
     dots.append(dot);
   }
   btn.append(dots);

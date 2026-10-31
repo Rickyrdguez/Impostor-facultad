@@ -56,6 +56,8 @@
         <ul id="player-list"></ul>
         <div id="lobby-controls" class="lobby-controls">
           <button id="btn-lang" class="btn small secondary">Elegir lenguaje</button>
+          <button id="btn-settings" class="btn small ghost">Ajustes de la partida</button>
+          <p id="settings-summary" class="hint"></p>
           <button id="btn-start" class="btn primary">Empezar partida</button>
           <p id="start-hint" class="hint"></p>
         </div>
@@ -151,6 +153,16 @@
       </div>
     </div>
 
+    <!-- Ajustes de la partida (sala de espera) -->
+    <div id="settings" class="overlay hidden">
+      <div class="card settings-card">
+        <h2>Ajustes de la partida</h2>
+        <p id="settings-note" class="hint"></p>
+        <ul id="settings-list" class="settings-list"></ul>
+        <button id="btn-settings-close" class="btn ghost">Cerrar</button>
+      </div>
+    </div>
+
     <!-- Banner de rol al empezar -->
     <div id="banner" class="banner hidden">
       <div id="banner-title" class="banner-title"></div>
@@ -212,8 +224,10 @@
     <div id="splash" class="fx fx-splash hidden"><div id="splash-text"></div></div>
     <div id="eject" class="fx fx-eject hidden">
       <canvas id="eject-canvas" width="320" height="320"></canvas>
+      <code id="eject-cmd" class="eject-cmd"></code>
       <h2 id="eject-text"></h2>
       <p id="eject-sub"></p>
+      <p id="eject-extra" class="eject-extra"></p>
     </div>
 
     <div id="toast" class="hidden" role="status"></div>

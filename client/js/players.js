@@ -22,7 +22,7 @@ function animate(p, dx, dy) {
 export function updateMe(dt, ghost) {
   const me = state.me;
   const v = moveVector();
-  const step = PLAYER_SPEED * dt;
+  const step = PLAYER_SPEED * (state.room?.settings.speed || 1) * dt;
   const next = moveWithCollisions(me.x, me.y, v.x * step, v.y * step, PLAYER_RADIUS, ghost);
   animate(me, next.x - me.x, next.y - me.y);
   me.x = next.x;

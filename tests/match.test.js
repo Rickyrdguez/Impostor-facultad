@@ -50,7 +50,7 @@ test('empezar: cada uno recibe su rol en privado y hay un impostor', async () =>
   assert.equal(got.filter((r) => r.role === 'impostor').length, 1);
   for (const t of await Promise.all(tasks)) assert.equal(t.list.length, 3);
   const room = await players[1].c.waitFor((m) => m.t === 'room' && m.phase === 'playing');
-  assert.ok(!JSON.stringify(room).includes('impostor'), 'los roles no se filtran a todos');
+  assert.ok(room.players.every((p) => !('role' in p)), 'los roles no se filtran a todos');
   players.forEach((p) => p.c.close());
 });
 

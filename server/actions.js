@@ -2,9 +2,8 @@
 // El servidor elige el objetivo y comprueba distancias: no se fía del cliente.
 
 import { EMERGENCY, STATIONS } from '../client/js/places.js';
+import { killCooldownMs, killRange } from './settings.js';
 import {
-  KILL_COOLDOWN_MS,
-  KILL_RANGE,
   REPORT_RANGE,
   TASK_MIN_MS,
   USE_RANGE,
@@ -33,18 +32,18 @@ export function kill(room, id, msg, now) {
   if (room.phase !== 'playing' || !killer || !killer.alive || !isImpostor(killer)) return [];
   if (now < killer.killReadyAt || killer.vent) return [];
   const victims = playerList(room).filter((p) => p.alive && !isImpostor(p) && !p.vent);
-  const victim = nearest(killer, victims, KILL_RANGE);
+  const victim = nearest(killer, victims, killRange(room));
   if (!victim) return [];
 
   victim.alive = false;
   victim.taskStart = null;
   room.bodies.push({ id: victim.id, x: Math.round(victim.x), y: Math.round(victim.y) });
-  killer.killReadyAt = now + KILL_COOLDOWN_MS;
+  killer.killReadyAt = now + killCooldownMs(room);
   return [
     toAll(roomInfo(room)),
     toAll({ t: 'bodies', list: room.bodies }),
     { to: victim.id, msg: { t: 'killed', by: killer.id } },
-    { to: killer.id, msg: { t: 'cooldown', ms: KILL_COOLDOWN_MS } },
+    { to: killer.id, msg: { t: 'cooldown', ms: killCooldownMs(room) } },
     ...checkVictory(room),
   ];
 }
@@ -81,12 +80,14 @@ export function taskDone(room, id, msg, now) {
   return [{ to: id, msg: tasksMessage(p) }, toAll(taskProgress(room)), ...checkVictory(room)];
 }
 
-// Botón de emergencia: una vez por jugador y partida, y no justo después de una reunión.
+// Botón de emergencia: las veces que diga el ajuste, y no justo después de una reunión.
 export function emergency(room, id, msg, now) {
   const p = room.players[id];
   if (room.phase !== 'playing' || !p || !p.alive || p.vent) return [];
   if (distance(p, EMERGENCY) > USE_RANGE) return [];
-  if (p.emergencyUsed) return [{ to: id, msg: { t: 'notice', text: 'Ya has usado tu botón de emergencia.' } }];
+  if (p.emergencyLeft <= 0) {
+    return [{ to: id, msg: { t: 'notice', text: 'Ya no te quedan reuniones de emergencia.' } }];
+  }
   if (now < room.emergencyReadyAt) {
     const s = Math.ceil((room.emergencyReadyAt - now) / 1000);
     return [{ to: id, msg: { t: 'notice', text: `El botón estará listo en ${s} s.` } }];
@@ -94,6 +95,6 @@ export function emergency(room, id, msg, now) {
   if (room.sabotage) {
     return [{ to: id, msg: { t: 'notice', text: 'No se puede convocar una reunión durante un sabotaje.' } }];
   }
-  p.emergencyUsed = true;
+  p.emergencyLeft--;
   return startMeeting(room, id, null, now);
 }

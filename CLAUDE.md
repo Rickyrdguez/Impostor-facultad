@@ -48,6 +48,11 @@ Ingeniería y Tecnología (ULL). Se juega online desde cualquier red.
   `effects` (pantallas de muerte, aviso de reunión y expulsión) y `sound`
   (efectos generados con Web Audio, sin archivos; botón de silencio).
 - Capturas del README en `docs/`.
+- Ajustes de la sala (al estilo Among Us) definidos en `shared/settings.js`
+  (tipo, rango y valor por defecto). El servidor los valida y aplica
+  (`server/settings.js`, atajos como `killCooldownMs(room)`); el cliente pinta
+  el menú con la misma lista (`client/js/settingsui.js`). Solo el anfitrión y
+  solo en la sala de espera. `config.js` exporta los valores por defecto.
 - `client/js/map.js` es datos + colisiones puras (sin DOM). Lo importan el
   cliente y el servidor (el servidor valida movimiento y distancias).
 - `shared/constants.js`: lo que usan servidor y cliente (lenguajes, tareas,

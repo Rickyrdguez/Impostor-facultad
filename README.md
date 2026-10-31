@@ -42,9 +42,30 @@ facultad), en el ordenador o en el móvil, sin instalar nada.
   muebles altos tapan la vista. El impostor ve un poco más lejos.
 - **Los muertos** son fantasmas: atraviesan paredes, lo ven todo y, si eran
   tripulantes, pueden seguir haciendo tareas.
+- **El expulsado recibe un `rm -rf`.** Si está activado, se dice si era el
+  impostor y cuántos quedan.
 - **Ganan los tripulantes** si expulsan al impostor o terminan las tareas.
   **Gana el impostor** si quedan tantos impostores como tripulantes o si el
   radón no se cierra a tiempo.
+
+## Ajustes de la partida
+
+En la sala de espera, el anfitrión puede cambiar en **Ajustes de la partida**
+(los demás los ven, pero no los cambian):
+
+| Ajuste | Por defecto |
+| --- | --- |
+| Impostores (1 a 3; nunca tantos como tripulantes) | 1 |
+| Espera para matar | 15 s |
+| Distancia para matar (corta, normal, larga) | Normal |
+| Tiempo de reunión | 40 s |
+| Reuniones de emergencia por jugador | 1 |
+| Espera del botón de emergencia | 15 s |
+| Decir si el expulsado era el impostor | Sí |
+| Votos anónimos | No |
+| Tareas por tripulante | 3 |
+| Velocidad de los jugadores | Normal |
+| Visión de los tripulantes y del impostor | Normal |
 
 ## Controles
 

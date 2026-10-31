@@ -11,9 +11,10 @@ import { backToLobby, placeAtSpawn, roleMessage } from './lobby.js';
 import { tickMeeting, forgetVoter } from './meeting.js';
 import { checkVictory } from './victory.js';
 import { sabotageMessage, tickSabotage } from './sabotage.js';
+import { createSettings } from './settings.js';
 
 export function createRoom(code) {
-  return { code, hostId: null, phase: 'lobby', players: {}, bodies: [], meeting: null };
+  return { code, hostId: null, phase: 'lobby', players: {}, bodies: [], meeting: null, settings: createSettings() };
 }
 
 export { playerCount, roomInfo };
@@ -93,7 +94,8 @@ export function handleMove(room, id, msg, now) {
   if (!p || room.phase === 'meeting' || p.vent) return [];
   const ghost = !p.alive;
   const dt = Math.min(now - p.lastMoveAt, MOVE_MAX_DT_MS);
-  const maxDist = (PLAYER_SPEED * Math.max(dt, 0)) / 1000 * MOVE_TOLERANCE + MOVE_SLACK;
+  const speed = PLAYER_SPEED * room.settings.speed;
+  const maxDist = (speed * Math.max(dt, 0)) / 1000 * MOVE_TOLERANCE + MOVE_SLACK;
   const dist = Math.hypot(msg.x - p.x, msg.y - p.y);
   const ok =
     dist <= maxDist &&
@@ -125,7 +127,7 @@ export function rejoinState(room, id, now) {
   if (m) {
     const ms = Math.max(0, m.endsAt - now);
     out.push(to({ t: 'meeting', caller: m.caller, body: m.body, ms, votedIds: Object.keys(m.votes) }));
-    if (m.stage === 'results') out.push(to({ t: 'result', votes: m.votes, ...m.result, ms }));
+    if (m.stage === 'results') out.push(to({ t: 'result', ...m.result, ms }));
   }
   if (room.result) out.push(to(room.result));
   return out;

@@ -7,7 +7,7 @@ import { EMERGENCY, FIX_POINTS, STATIONS, VENTS } from './places.js';
 import { pendingFixPoints } from './sabotageui.js';
 import { openMinigame } from './minigames/index.js';
 import { play } from './sound.js';
-import { KILL_RANGE, REPORT_RANGE, USE_RANGE, sabotageById, taskById } from '../../shared/constants.js';
+import { REPORT_RANGE, USE_RANGE, sabotageById, taskById } from '../../shared/constants.js';
 
 const dist = (a, x, y) => Math.hypot(a.x - x, a.y - y);
 
@@ -38,7 +38,8 @@ export function killTarget() {
   if (!playing() || state.role !== 'impostor' || !amAlive() || state.vent || killCooldownMs() > 0) return null;
   for (const [id, o] of state.others) {
     const info = playerInfo(id);
-    if (info?.alive && !state.allies.includes(id) && dist(state.me, o.x, o.y) <= KILL_RANGE) return id;
+    const range = state.room.settings.killDistance;
+    if (info?.alive && !state.allies.includes(id) && dist(state.me, o.x, o.y) <= range) return id;
   }
   return null;
 }
@@ -56,7 +57,7 @@ export function useTarget() {
   const task = nearestTask();
   if (task) options.push({ kind: 'task', id: task.id, d: task.d });
   const me = myInfo();
-  if (amAlive() && me && !me.buttonUsed && !state.sabotage) {
+  if (amAlive() && me && me.buttonsLeft > 0 && !state.sabotage) {
     const d = dist(state.me, EMERGENCY.x, EMERGENCY.y);
     if (d <= USE_RANGE) options.push({ kind: 'emergency', id: 'emergency', d });
   }

@@ -1,13 +1,7 @@
 // Reuniones: chat, votación con temporizador y expulsión. Lógica pura.
 
-import {
-  CHAT_COOLDOWN_MS,
-  CHAT_MAX_LENGTH,
-  EMERGENCY_COOLDOWN_MS,
-  KILL_COOLDOWN_MS,
-  MEETING_MS,
-  RESULT_MS,
-} from './config.js';
+import { CHAT_COOLDOWN_MS, CHAT_MAX_LENGTH, RESULT_MS } from './config.js';
+import { emergencyCooldownMs, killCooldownMs, meetingMs } from './settings.js';
 import { isImpostor, playerList, roomInfo, toAll } from './info.js';
 import { sendAllToSpawn } from './lobby.js';
 import { checkVictory } from './victory.js';
@@ -21,7 +15,7 @@ const voters = (room) => playerList(room).filter((p) => p.alive);
 // Alguien reporta un cuerpo: todos a la reunión y los cuerpos desaparecen.
 export function startMeeting(room, callerId, bodyId, now) {
   room.phase = 'meeting';
-  room.meeting = { caller: callerId, body: bodyId, stage: 'voting', endsAt: now + MEETING_MS, votes: {} };
+  room.meeting = { caller: callerId, body: bodyId, stage: 'voting', endsAt: now + meetingMs(room), votes: {} };
   room.bodies = [];
   for (const p of playerList(room)) p.taskStart = null;
   return [
@@ -29,7 +23,7 @@ export function startMeeting(room, callerId, bodyId, now) {
     ...onMeetingStart(room, now),
     toAll(roomInfo(room)),
     toAll({ t: 'bodies', list: [] }),
-    toAll({ t: 'meeting', caller: callerId, body: bodyId, ms: MEETING_MS }),
+    toAll({ t: 'meeting', caller: callerId, body: bodyId, ms: meetingMs(room) }),
   ];
 }
 
@@ -84,6 +78,11 @@ function tally(votes) {
   return !best || tie || best === SKIP ? null : best;
 }
 
+// Votos anónimos: se sabe cuántos votos tiene cada uno, pero no de quién.
+function anonymous(votes) {
+  return Object.fromEntries(Object.values(votes).map((target, i) => [`anon${i}`, target]));
+}
+
 function finishVoting(room, now) {
   const m = room.meeting;
   const ejectedId = tally(m.votes);
@@ -91,8 +90,14 @@ function finishVoting(room, now) {
   if (ejected) ejected.alive = false;
   m.stage = 'results';
   m.endsAt = now + RESULT_MS;
-  m.result = { ejected: ejectedId, wasImpostor: ejected ? isImpostor(ejected) : null };
-  const result = { t: 'result', votes: m.votes, ...m.result, ms: RESULT_MS };
+  const confirm = room.settings.confirmEjects;
+  m.result = {
+    ejected: ejectedId,
+    wasImpostor: ejected && confirm ? isImpostor(ejected) : null,
+    impostorsLeft: confirm ? playerList(room).filter((p) => p.alive && isImpostor(p)).length : null,
+    votes: room.settings.anonymousVotes ? anonymous(m.votes) : m.votes,
+  };
+  const result = { t: 'result', ...m.result, ms: RESULT_MS };
   return [toAll(result), toAll(roomInfo(room))];
 }
 
@@ -102,11 +107,11 @@ function endMeeting(room, now) {
   if (ended.length) return ended;
   room.phase = 'playing';
   room.meeting = null;
-  room.emergencyReadyAt = now + EMERGENCY_COOLDOWN_MS;
+  room.emergencyReadyAt = now + emergencyCooldownMs(room);
   const out = [toAll(roomInfo(room)), ...sendAllToSpawn(room, now)];
   for (const p of playerList(room).filter(isImpostor)) {
-    p.killReadyAt = now + KILL_COOLDOWN_MS;
-    out.push({ to: p.id, msg: { t: 'cooldown', ms: KILL_COOLDOWN_MS } });
+    p.killReadyAt = now + killCooldownMs(room);
+    out.push({ to: p.id, msg: { t: 'cooldown', ms: killCooldownMs(room) } });
   }
   return out;
 }
