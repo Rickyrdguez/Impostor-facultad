@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="css/meeting.css" />
     <link rel="stylesheet" href="css/minigames.css" />
     <link rel="stylesheet" href="css/minigames2.css" />
+    <link rel="stylesheet" href="css/effects.css" />
   </head>
   <body>
     <canvas id="game"></canvas>
@@ -48,6 +49,7 @@
       <div id="room-card" class="card room-card">
         <div class="room-head">
           <div class="room-code">Sala <strong id="room-code"></strong></div>
+          <button id="btn-sound" class="btn small ghost" aria-label="Activar o silenciar el sonido">♪</button>
           <button id="btn-map" class="btn small secondary hidden">Mapa <kbd>M</kbd></button>
           <button id="btn-leave" class="btn small ghost">Salir</button>
         </div>
@@ -199,6 +201,19 @@
     <div id="reconnecting" class="hidden" role="status">
       <span class="spinner" aria-hidden="true"></span>
       Reconectando…
+    </div>
+
+    <!-- Pantallas animadas -->
+    <div id="death" class="fx fx-death hidden">
+      <h2>¡Te han eliminado!</h2>
+      <canvas id="death-canvas" width="320" height="320"></canvas>
+      <p id="death-killer"></p>
+    </div>
+    <div id="splash" class="fx fx-splash hidden"><div id="splash-text"></div></div>
+    <div id="eject" class="fx fx-eject hidden">
+      <canvas id="eject-canvas" width="320" height="320"></canvas>
+      <h2 id="eject-text"></h2>
+      <p id="eject-sub"></p>
     </div>
 
     <div id="toast" class="hidden" role="status"></div>

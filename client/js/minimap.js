@@ -59,17 +59,22 @@ function dot(ctx, x, y, r, fill, stroke = '#fff') {
   ctx.stroke();
 }
 
+// Nombres de las salas sobre una etiqueta color crema (tapa los rótulos del suelo).
 function drawLabels(ctx, u) {
   ctx.font = `600 ${LABEL_PX * u}px Fredoka, sans-serif`;
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.lineWidth = 3 * u;
-  ctx.strokeStyle = 'rgba(255, 248, 236, 0.85)';
-  ctx.fillStyle = PALETTE.brickMortar;
+  const padX = 5 * u;
+  const h = (LABEL_PX + 6) * u;
   for (const room of ROOMS) {
     const [x, y] = room.label || (room.rect ? [room.rect[0] + room.rect[2] / 2, room.rect[1] + room.rect[3] / 2] : room.circle);
-    ctx.strokeText(room.name, x, y);
-    ctx.fillText(room.name, x, y);
+    const w = ctx.measureText(room.name).width + padX * 2;
+    ctx.fillStyle = 'rgba(255, 248, 236, 0.92)';
+    ctx.beginPath();
+    ctx.roundRect(x - w / 2, y - h / 2, w, h, h / 2);
+    ctx.fill();
+    ctx.fillStyle = PALETTE.brickMortar;
+    ctx.fillText(room.name, x, y + u);
   }
 }
 

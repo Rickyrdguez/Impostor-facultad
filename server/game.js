@@ -112,7 +112,8 @@ export function rejoinState(room, id, now) {
   const to = (msg) => ({ to: id, msg });
   const out = [to(roomInfo(room)), to({ t: 'bodies', list: room.bodies })];
   if (p.role) {
-    out.push(to(roleMessage(room, p)), to(tasksMessage(p)), to(taskProgress(room)));
+    // rejoin: el cliente no repite el banner de rol al reconectar
+    out.push(to({ ...roleMessage(room, p), rejoin: true }), to(tasksMessage(p)), to(taskProgress(room)));
   }
   if (p.role === 'impostor') out.push(to({ t: 'cooldown', ms: Math.max(0, p.killReadyAt - now) }));
   if (p.vent) out.push(to({ t: 'vent', id: p.vent }));

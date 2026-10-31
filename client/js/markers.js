@@ -27,41 +27,84 @@ export function drawTaskMarker(ctx, x, y, now, color = PALETTE.tassel) {
   ctx.restore();
 }
 
-// Cuerpo: el personaje tumbado, con ojos en X y el birrete caído al lado.
+const CORPSE_SCALE = 1.35; // los cuerpos algo más grandes para que se vean bien
+const EDGE_MARGIN = 34; // separación de las flechas respecto al borde (px)
+const EDGE_SIZE = 18;
+
+// Cuerpo: el personaje tumbado, con ojos en X, su insignia y el birrete caído al lado.
 export function drawCorpse(ctx, body, langId) {
   const lang = languageById(langId);
-  const { x, y } = body;
+  const r = PLAYER_RADIUS;
   ctx.save();
+  ctx.translate(body.x, body.y);
+  ctx.scale(CORPSE_SCALE, CORPSE_SCALE);
   ctx.fillStyle = PALETTE.shadow;
   ctx.beginPath();
-  ctx.ellipse(x + 3, y + 8, PLAYER_RADIUS * 1.2, PLAYER_RADIUS * 0.55, 0, 0, Math.PI * 2);
+  ctx.ellipse(3, 8, r * 1.2, r * 0.55, 0, 0, Math.PI * 2);
   ctx.fill();
   ctx.fillStyle = lang.color;
   ctx.strokeStyle = PALETTE.outline;
   ctx.lineWidth = 2.5;
   ctx.beginPath();
-  ctx.ellipse(x, y, PLAYER_RADIUS * 1.1, PLAYER_RADIUS * 0.7, -0.15, 0, Math.PI * 2);
+  ctx.ellipse(0, 0, r * 1.1, r * 0.7, -0.15, 0, Math.PI * 2);
   ctx.fill();
   ctx.stroke();
   // Ojos en X
   ctx.strokeStyle = '#1d1d24';
   ctx.lineWidth = 2;
-  for (const ex of [x - 7, x + 3]) {
+  for (const ex of [-9, 1]) {
     ctx.beginPath();
-    ctx.moveTo(ex - 3, y - 6);
-    ctx.lineTo(ex + 3, y);
-    ctx.moveTo(ex + 3, y - 6);
-    ctx.lineTo(ex - 3, y);
+    ctx.moveTo(ex - 3, -7);
+    ctx.lineTo(ex + 3, -1);
+    ctx.moveTo(ex + 3, -7);
+    ctx.lineTo(ex - 3, -1);
     ctx.stroke();
   }
+  // Insignia con las letras del lenguaje
+  ctx.fillStyle = '#ffffff';
+  ctx.beginPath();
+  ctx.arc(11, 4, 6.5, 0, Math.PI * 2);
+  ctx.fill();
+  ctx.fillStyle = lang.ink === '#ffffff' ? lang.color : '#1d1d24';
+  ctx.font = `700 ${lang.short.length > 2 ? 4.5 : 6}px Fredoka, sans-serif`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(lang.short, 11, 4.5);
   // Birrete en el suelo
   ctx.fillStyle = PALETTE.cap;
   ctx.beginPath();
-  ctx.moveTo(x + 18, y - 16);
-  ctx.lineTo(x + 32, y - 21);
-  ctx.lineTo(x + 44, y - 15);
-  ctx.lineTo(x + 30, y - 10);
+  ctx.moveTo(18, -16);
+  ctx.lineTo(32, -21);
+  ctx.lineTo(44, -15);
+  ctx.lineTo(30, -10);
   ctx.closePath();
   ctx.fill();
+  ctx.restore();
+}
+
+// Flecha en el borde de la pantalla que apunta a algo que queda fuera de ella.
+// (sx, sy): posición del objetivo en píxeles de pantalla; w, h: tamaño de la pantalla.
+export function drawEdgeArrow(ctx, sx, sy, w, h, color, scale = 1) {
+  const m = EDGE_MARGIN * scale;
+  if (sx > m && sx < w - m && sy > m && sy < h - m) return; // ya se ve
+  const cx = w / 2;
+  const cy = h / 2;
+  const angle = Math.atan2(sy - cy, sx - cx);
+  // Punto donde la línea centro -> objetivo corta el rectángulo interior.
+  const k = Math.min(Math.abs((cx - m) / Math.cos(angle)), Math.abs((cy - m) / Math.sin(angle)));
+  const size = EDGE_SIZE * scale;
+  ctx.save();
+  ctx.translate(cx + Math.cos(angle) * k, cy + Math.sin(angle) * k);
+  ctx.rotate(angle);
+  ctx.fillStyle = color;
+  ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+  ctx.lineWidth = 2 * scale;
+  ctx.beginPath();
+  ctx.moveTo(size, 0);
+  ctx.lineTo(-size * 0.7, size * 0.75);
+  ctx.lineTo(-size * 0.7, -size * 0.75);
+  ctx.closePath();
+  ctx.fill();
+  ctx.stroke();
   ctx.restore();
 }

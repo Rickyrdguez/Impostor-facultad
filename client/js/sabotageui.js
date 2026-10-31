@@ -4,6 +4,7 @@ import { state, amAlive, phase } from './state.js';
 import * as net from './network.js';
 import { FIX_POINTS } from './places.js';
 import { SABOTAGES, sabotageById } from '../../shared/constants.js';
+import { play } from './sound.js';
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -89,7 +90,10 @@ export function updateSabotage() {
   const s = state.sabotage;
   const left = s?.endsAt ? Math.max(0, Math.ceil((s.endsAt - performance.now()) / 1000)) : null;
   const text = left === null ? '' : `${left} s`;
-  if (els.time.textContent !== text) els.time.textContent = text;
+  if (els.time.textContent !== text) {
+    if (text) play('beep'); // pitido cada segundo del radón
+    els.time.textContent = text;
+  }
   const showButton = phase() === 'playing' && state.role === 'impostor' && amAlive();
   els.button.classList.toggle('hidden', !showButton);
   const cd = Math.ceil(sabotageCooldownMs() / 1000);

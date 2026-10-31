@@ -542,3 +542,31 @@
   flex-wrap: nowrap;
   white-space: nowrap;
 }
+
+#btn-sound.muted {
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* ---------- Móvil: cabecera y progreso sin solaparse ---------- */
+
+@media (max-width: 600px) {
+  .room-head kbd {
+    display: none;
+  }
+  .room-card.compact {
+    right: 12px;
+  }
+  .room-card.compact .room-head {
+    gap: 6px;
+  }
+  .progress {
+    top: calc(max(12px, env(safe-area-inset-top)) + 60px);
+    left: 12px;
+    right: auto;
+    width: 60vw;
+  }
+  .alarm {
+    top: calc(max(12px, env(safe-area-inset-top)) + 100px);
+  }
+}

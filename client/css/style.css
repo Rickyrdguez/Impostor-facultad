@@ -219,7 +219,7 @@ kbd {
   position: fixed;
   top: max(12px, env(safe-area-inset-top));
   left: max(12px, env(safe-area-inset-left));
-  width: 220px;
+  width: 250px;
   padding: 12px 14px;
   font-size: 0.95rem;
 }

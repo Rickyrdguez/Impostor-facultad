@@ -5,6 +5,8 @@ import { PALETTE } from './palette.js';
 
 const R = PLAYER_RADIUS;
 const BOUNCE = 5; // altura del rebote al andar
+const GHOST_FLOAT = 4; // los fantasmas suben y bajan
+const GHOST_FLOAT_MS = 700;
 
 function drawShadow(ctx, x, y, lift) {
   const k = 1 - lift / (BOUNCE * 3);
@@ -117,7 +119,8 @@ export function drawName(ctx, x, y, name) {
 // p: { x, y, lang, name, fx, fy, moving, walk, ghost }
 export function drawCharacter(ctx, p) {
   const lang = languageById(p.lang);
-  const lift = p.moving ? Math.abs(Math.sin(p.walk)) * BOUNCE : 0;
+  const float = p.ghost ? (Math.sin(performance.now() / GHOST_FLOAT_MS) + 1) * GHOST_FLOAT : 0;
+  const lift = (p.moving ? Math.abs(Math.sin(p.walk)) * BOUNCE : 0) + float;
   const y = p.y - lift;
   ctx.save();
   if (p.ghost) ctx.globalAlpha = 0.5;

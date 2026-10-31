@@ -3,12 +3,13 @@
 import { MAP } from './map.js';
 import { buildMapCanvas } from './mapview.js';
 import { drawCharacter } from './characters.js';
-import { drawCorpse, drawTaskMarker } from './markers.js';
+import { drawCorpse, drawEdgeArrow, drawTaskMarker } from './markers.js';
 import { PALETTE } from './palette.js';
 import { buildVisionGrid, visibilityPolygon, canSee } from './vision.js';
 import { PLAYER_RADIUS } from '../../shared/constants.js';
 
 const VIEW_SIZE = 620; // unidades del mundo visibles en el lado corto de la pantalla
+const VIEW_SIZE_PORTRAIT = 460; // en vertical se acerca la cámara para que no se vea todo diminuto
 const MAX_DPR = 2;
 const MAP_PIXEL_BUDGET = 12e6; // límite de píxeles del mapa pre-dibujado
 const ALERT_COLOR = '#ff5a45'; // puntos donde arreglar un sabotaje
@@ -41,7 +42,8 @@ function resize() {
 
 // Escala de la cámara en píxeles del canvas por unidad del mundo.
 function cameraScale() {
-  return (Math.min(innerWidth, innerHeight) / VIEW_SIZE) * dpr;
+  const view = innerWidth < innerHeight ? VIEW_SIZE_PORTRAIT : VIEW_SIZE;
+  return (Math.min(innerWidth, innerHeight) / view) * dpr;
 }
 
 // Canvas con el mapa pre-dibujado (lo reutiliza el mapa de la tecla M).
@@ -120,4 +122,10 @@ export function render(view) {
   const now = performance.now();
   for (const [x, y] of view.markers || []) drawTaskMarker(ctx, x, y, now);
   for (const [x, y] of view.alerts || []) drawTaskMarker(ctx, x, y, now, ALERT_COLOR);
+
+  // Flechas en el borde hacia lo que queda fuera de la pantalla.
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  const toScreen = ([x, y]) => [x * s + transform[4], y * s + transform[5]];
+  for (const p of view.markers || []) drawEdgeArrow(ctx, ...toScreen(p), canvas.width, canvas.height, PALETTE.tassel, dpr);
+  for (const p of view.alerts || []) drawEdgeArrow(ctx, ...toScreen(p), canvas.width, canvas.height, ALERT_COLOR, dpr);
 }

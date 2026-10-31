@@ -4,6 +4,10 @@ import { state, amAlive, playerInfo } from './state.js';
 import * as net from './network.js';
 import { langDot } from './ui.js';
 import { languageById } from '../../shared/constants.js';
+import { play } from './sound.js';
+import { showEjection } from './effects.js';
+
+const EJECT_DELAY_MS = 2200; // se ve el recuento un momento antes de la expulsión
 
 const URGENT_S = 10; // últimos segundos con el temporizador en rojo
 const $ = (id) => document.getElementById(id);
@@ -45,6 +49,7 @@ export function isMeetingOpen() {
 function castVote(target) {
   if (!m || m.myVote || m.result || !amAlive()) return;
   m.myVote = target;
+  play('vote');
   net.send({ t: 'vote', target });
   render();
 }
@@ -100,6 +105,7 @@ export function onChat(msg) {
 export function onVoted(msg) {
   if (!m) return;
   m.voted.add(msg.id);
+  if (msg.id !== state.myId) play('click');
   render();
 }
 
@@ -108,6 +114,10 @@ export function onResult(msg) {
   m.result = msg;
   m.endsAt = performance.now() + msg.ms;
   render();
+  const ejected = msg.ejected ? playerInfo(msg.ejected) : null;
+  const title = resultText(msg).split('. ')[0] + '.';
+  const sub = !ejected ? '' : msg.wasImpostor ? 'Era el impostor.' : 'No era el impostor.';
+  setTimeout(() => m && m.result === msg && showEjection(title, sub, ejected?.lang), EJECT_DELAY_MS);
 }
 
 function resultText(r) {
@@ -179,7 +189,10 @@ export function updateMeeting() {
   if (!m) return;
   const s = Math.max(0, Math.ceil((m.endsAt - performance.now()) / 1000));
   const text = `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
-  if (els.time.textContent !== text) els.time.textContent = text;
+  if (els.time.textContent !== text) {
+    if (!m.result && s <= URGENT_S && s > 0) play('tick');
+    els.time.textContent = text;
+  }
   els.time.parentElement.classList.toggle('urgent', !m.result && s <= URGENT_S);
 }
 

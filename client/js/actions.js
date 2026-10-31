@@ -6,6 +6,7 @@ import * as net from './network.js';
 import { EMERGENCY, FIX_POINTS, STATIONS, VENTS } from './places.js';
 import { pendingFixPoints } from './sabotageui.js';
 import { openMinigame } from './minigames/index.js';
+import { play } from './sound.js';
 import { KILL_RANGE, REPORT_RANGE, USE_RANGE, sabotageById, taskById } from '../../shared/constants.js';
 
 const dist = (a, x, y) => Math.hypot(a.x - x, a.y - y);
@@ -79,6 +80,7 @@ export function useTarget() {
 function startTask(id) {
   if (state.role === 'crew') net.send({ t: 'task-start' });
   openMinigame(id, taskById(id).name, () => {
+    play('task');
     if (state.role === 'crew') net.send({ t: 'task-done' });
     else state.fakeDone.add(id);
   });
@@ -88,7 +90,10 @@ function startTask(id) {
 function startFix(id) {
   const point = FIX_POINTS.find((p) => p.id === id);
   const title = `${sabotageById(point.sabotage).fixTitle} · ${point.room}`;
-  openMinigame(id, title, () => net.send({ t: 'fix', point: id }));
+  openMinigame(id, title, () => {
+    play('task');
+    net.send({ t: 'fix', point: id });
+  });
 }
 
 function startUse() {

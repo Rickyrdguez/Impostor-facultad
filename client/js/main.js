@@ -125,6 +125,7 @@ async function start() {
   bindVentPanel();
   bindSabotage();
   bindMinigames();
+  ui.bindSoundButton();
   tryResume();
   // Espera a la fuente para que los nombres del suelo salgan con Fredoka.
   const timeout = new Promise((r) => setTimeout(r, FONT_TIMEOUT_MS));

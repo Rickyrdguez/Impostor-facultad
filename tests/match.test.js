@@ -20,7 +20,7 @@ async function roomOfThree() {
   const hw = host.waitFor('welcome');
   host.send({ t: 'create', name: 'Ana' });
   const { code, id } = await hw;
-  const players = [{ c: host, id }];
+  const players = [{ c: host, id, code }];
   for (const name of ['Beto', 'Carla']) {
     const c = await client();
     const w = c.waitFor('welcome');
@@ -67,7 +67,7 @@ test('si alguien sale y quedan pocos, se vuelve a la sala', async () => {
 
 test('no se puede unir nadie con la partida empezada', async () => {
   const players = await roomOfThree();
-  const { code } = players[0].c.messages.find((m) => m.t === 'room') || (await players[0].c.waitFor('room'));
+  const { code } = players[0];
   players[0].c.send({ t: 'start' });
   await players[0].c.waitFor((m) => m.t === 'room' && m.phase === 'playing');
   const late = await client();

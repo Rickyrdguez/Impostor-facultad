@@ -21,7 +21,7 @@ export const EMERGENCY_COOLDOWN_MS = 15000; // tras empezar y tras cada reunión
 export const SABOTAGE_COOLDOWN_MS = 30000; // entre sabotajes (y al empezar)
 export const RADON_MS = 45000; // tiempo para cerrar la fuga de radón antes de perder
 export const MEETING_MS = 40000; // tiempo para hablar y votar
-export const RESULT_MS = 6000; // tiempo mostrando el resultado de la votación
+export const RESULT_MS = 8000; // recuento + animación de expulsión
 export const CHAT_COOLDOWN_MS = 700; // entre dos mensajes del mismo jugador
 
 // Red y seguridad

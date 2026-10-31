@@ -3,6 +3,7 @@
 
 import { LANGUAGES, languageById } from '../../shared/constants.js';
 import { drawCharacter } from './characters.js';
+import { isMuted, toggleMute } from './sound.js';
 
 const $ = (id) => document.getElementById(id);
 const TOAST_MS = 3000;
@@ -26,6 +27,7 @@ export const els = {
   knob: $('knob'),
   toast: $('toast'),
   reconnecting: $('reconnecting'),
+  sound: $('btn-sound'),
   logo: $('logo'),
 };
 
@@ -108,4 +110,14 @@ export function drawLogo(t) {
   const lang = LANGUAGES[Math.floor(t / LOGO_SWAP_MS) % LANGUAGES.length].id;
   drawCharacter(ctx, { x: 40, y: 36, lang, name: '', fx: look, fy: 0.3, moving: true, walk: t / 160 });
   ctx.restore();
+}
+
+// Botón de sonido: ♪ tachado cuando está silenciado.
+export function bindSoundButton() {
+  const paint = () => els.sound.classList.toggle('muted', isMuted());
+  els.sound.addEventListener('click', () => {
+    toggleMute();
+    paint();
+  });
+  paint();
 }

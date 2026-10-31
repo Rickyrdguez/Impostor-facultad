@@ -44,7 +44,10 @@ Ingeniería y Tecnología (ULL). Se juega online desde cualquier red.
   dragging, rubbing, picking, wires, tuning, keypad, switches). Cada
   minijuego recibe un contexto `g` y llama a `g.finish()` al superarlo.
   El servidor solo exige estar cerca y `TASK_MIN_MS` entre abrir y terminar.
-- Más módulos de cliente: `minimap` (tecla M), `ventui`, `sabotageui`.
+- Más módulos de cliente: `minimap` (tecla M), `ventui`, `sabotageui`,
+  `effects` (pantallas de muerte, aviso de reunión y expulsión) y `sound`
+  (efectos generados con Web Audio, sin archivos; botón de silencio).
+- Capturas del README en `docs/`.
 - `client/js/map.js` es datos + colisiones puras (sin DOM). Lo importan el
   cliente y el servidor (el servidor valida movimiento y distancias).
 - `shared/constants.js`: lo que usan servidor y cliente (lenguajes, tareas,

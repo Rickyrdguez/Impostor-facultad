@@ -10,6 +10,8 @@ import { renderLobby } from './lobby.js';
 import { onSnapshot, setMyPosition } from './players.js';
 import { onVent } from './ventui.js';
 import { closeMinigame } from './minigames/index.js';
+import { play } from './sound.js';
+import { clearEffects, hideEjection, showDeath, showSplash, SPLASH_DELAY_MS } from './effects.js';
 import { toggleMinimap } from './minimap.js';
 import { clearSabotage, onSabotage, onSabotageCooldown } from './sabotageui.js';
 
@@ -28,7 +30,10 @@ function onPhaseChange(now) {
     end.hideEnd();
     meeting.closeMeeting();
   }
-  if (now === 'playing') meeting.closeMeeting();
+  if (now === 'playing') {
+    meeting.closeMeeting();
+    hideEjection();
+  }
   if (now !== 'ended') end.hideEnd();
 }
 
@@ -61,7 +66,10 @@ net.on('role', (m) => {
   state.allies = m.allies;
   state.fakeDone = new Set();
   hud.renderHudPhase();
-  if (phase() === 'playing') hud.showRoleBanner();
+  if (phase() === 'playing' && !m.rejoin) {
+    hud.showRoleBanner();
+    play(m.role === 'impostor' ? 'impostor' : 'crew');
+  }
 });
 
 net.on('tasks', (m) => {
@@ -75,15 +83,26 @@ net.on('progress', (m) => {
   hud.renderProgress();
 });
 
-net.on('bodies', (m) => (state.bodies = m.list));
+net.on('bodies', (m) => {
+  // El impostor oye su propia muerte; la víctima la ve en su pantalla.
+  if (m.list.length > state.bodies.length && state.role === 'impostor') play('kill');
+  state.bodies = m.list;
+});
 
 net.on('cooldown', (m) => (state.killReadyAt = performance.now() + m.ms));
 
-net.on('killed', () => ui.toast('¡Te han eliminado! Ahora eres un fantasma.'));
+net.on('killed', (m) => {
+  closeMinigame();
+  showDeath(m.by);
+  ui.toast('Ahora eres un fantasma: atraviesas paredes y puedes seguir con tus tareas.');
+});
 
 net.on('meeting', (m) => {
   closeMinigame();
-  meeting.openMeeting(m);
+  // Al reconectar en mitad de una reunión no se repite el aviso.
+  if (m.votedIds) return meeting.openMeeting(m);
+  showSplash(m.body ? '¡Cuerpo encontrado!' : '¡Reunión de emergencia!');
+  setTimeout(() => meeting.openMeeting({ ...m, ms: m.ms - SPLASH_DELAY_MS }), SPLASH_DELAY_MS);
 });
 
 net.on('chat', (m) => meeting.onChat(m));
@@ -92,15 +111,22 @@ net.on('result', (m) => meeting.onResult(m));
 
 net.on('end', (m) => {
   meeting.closeMeeting();
+  hideEjection();
   end.showEnd(m);
+  const won = (m.winner === 'impostor') === (state.role === 'impostor');
+  play(won ? 'win' : 'lose');
 });
 
 net.on('notice', (m) => ui.toast(m.text));
 
-net.on('vent', (m) => onVent(m.id));
+net.on('vent', (m) => {
+  play('vent');
+  onVent(m.id);
+});
 
 net.on('sabotage', (m) => {
   const wasWifi = state.sabotage?.kind === 'wifi';
+  if (m.kind && !state.sabotage) play('alarm');
   onSabotage(m);
   if (!m.kind) closeMinigame();
   if (wasWifi || m.kind === 'wifi') hud.renderTasks();
@@ -115,6 +141,7 @@ export function forgetPhase() {
   onVent(null);
   toggleMinimap(false);
   clearSabotage();
+  clearEffects();
   meeting.closeMeeting();
   end.hideEnd();
 }
