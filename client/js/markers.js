@@ -1,4 +1,4 @@
-// Marcas dinámicas sobre el mapa: tareas pendientes, anillo de progreso y cuerpos.
+// Marcas dinámicas sobre el mapa: tareas pendientes, sabotajes y cuerpos.
 
 import { PALETTE } from './palette.js';
 import { PLAYER_RADIUS, languageById } from '../../shared/constants.js';
@@ -24,23 +24,6 @@ export function drawTaskMarker(ctx, x, y, now, color = PALETTE.tassel) {
   ctx.lineTo(x, top);
   ctx.closePath();
   ctx.fill();
-  ctx.restore();
-}
-
-// Anillo de progreso alrededor del jugador mientras mantiene E.
-export function drawTaskRing(ctx, x, y, progress) {
-  const r = PLAYER_RADIUS + 12;
-  ctx.save();
-  ctx.lineWidth = 6;
-  ctx.lineCap = 'round';
-  ctx.strokeStyle = 'rgba(0, 0, 0, 0.35)';
-  ctx.beginPath();
-  ctx.arc(x, y, r, 0, Math.PI * 2);
-  ctx.stroke();
-  ctx.strokeStyle = '#6fc27b';
-  ctx.beginPath();
-  ctx.arc(x, y, r, -Math.PI / 2, -Math.PI / 2 + progress * Math.PI * 2);
-  ctx.stroke();
   ctx.restore();
 }
 

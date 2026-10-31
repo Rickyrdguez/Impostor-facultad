@@ -5,7 +5,7 @@ export {
   USE_RANGE,
   KILL_RANGE,
   REPORT_RANGE,
-  TASK_HOLD_MS,
+  TASK_MIN_MS,
   CHAT_MAX_LENGTH,
 } from '../shared/constants.js';
 
@@ -23,7 +23,6 @@ export const RADON_MS = 45000; // tiempo para cerrar la fuga de radón antes de 
 export const MEETING_MS = 40000; // tiempo para hablar y votar
 export const RESULT_MS = 6000; // tiempo mostrando el resultado de la votación
 export const CHAT_COOLDOWN_MS = 700; // entre dos mensajes del mismo jugador
-export const TASK_TIME_TOLERANCE = 0.8; // se acepta la tarea si se mantuvo el 80 % del tiempo
 
 // Red y seguridad
 export const MAX_MESSAGE_BYTES = 1024;

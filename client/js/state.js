@@ -16,7 +16,6 @@ export const state = {
   progress: { done: 0, total: 0 },
   bodies: [], // [{ id, x, y }]
   killReadyAt: 0, // performance.now() a partir del cual se puede matar
-  hold: null, // tarea en curso: { id, start }
   vent: null, // trampilla en la que está el impostor (o null)
   sabotage: null, // sabotaje activo: { kind, endsAt, fixed: Set } o null
   sabotageReadyAt: 0, // performance.now() a partir del cual el impostor puede sabotear
@@ -52,7 +51,6 @@ export function resetMatch() {
   state.progress = { done: 0, total: 0 };
   state.bodies = [];
   state.killReadyAt = 0;
-  state.hold = null;
   state.vent = null;
   state.sabotage = null;
   state.sabotageReadyAt = 0;

@@ -3,6 +3,7 @@
 import { state } from './state.js';
 import * as net from './network.js';
 import { connectedVents, ventById } from './places.js';
+import { closeMinigame } from './minigames/index.js';
 
 const $ = (id) => document.getElementById(id);
 const els = {
@@ -19,7 +20,7 @@ export function bindVentPanel() {
 // Llega 'vent' del servidor: entra, cambia de trampilla o sale.
 export function onVent(id) {
   state.vent = id;
-  state.hold = null;
+  closeMinigame();
   els.panel.classList.toggle('hidden', !id);
   if (!id) return;
   els.room.textContent = ventById(id).room;

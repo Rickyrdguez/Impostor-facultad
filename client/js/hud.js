@@ -28,20 +28,14 @@ const els = {
 const USE_LABELS = { task: 'Usar', emergency: 'Reunión', vent: 'Trampilla', fix: 'Arreglar' };
 let bannerTimer = null;
 
-// Los botones funcionan con ratón y con el dedo; "usar" hay que mantenerlo.
+// Los botones funcionan con ratón y con el dedo.
 export function bindHud() {
-  const hold = (btn, name) => {
+  for (const [btn, name] of [[els.use, 'use'], [els.kill, 'kill'], [els.report, 'report']]) {
     btn.addEventListener('pointerdown', (e) => {
       e.preventDefault();
       act(name, true);
     });
-    for (const ev of ['pointerup', 'pointerleave', 'pointercancel']) {
-      btn.addEventListener(ev, () => act(name, false));
-    }
-  };
-  hold(els.use, 'use');
-  hold(els.kill, 'kill');
-  hold(els.report, 'report');
+  }
 }
 
 export function showRoleBanner() {
@@ -113,7 +107,7 @@ function setEnabled(btn, on) {
 export function updateButtons() {
   if (els.actions.classList.contains('hidden')) return;
   const target = useTarget();
-  setEnabled(els.use, Boolean(target) || Boolean(state.hold));
+  setEnabled(els.use, Boolean(target));
   const label = state.vent ? 'Salir' : USE_LABELS[target?.kind] || 'Usar';
   if (els.useLabel.textContent !== label) els.useLabel.textContent = label;
   setEnabled(els.report, Boolean(reportTarget()));

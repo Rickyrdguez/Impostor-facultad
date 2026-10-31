@@ -1,0 +1,576 @@
+/* Minijuegos (segunda parte): frotar, elegir, cables, ajustar, teclado e interruptores. */
+
+/* ---------- Frotar ---------- */
+
+.mg-surface {
+  position: absolute;
+  inset: 20px;
+  border-radius: 14px;
+  cursor: grab;
+}
+
+.mg-surface.wood {
+  background: repeating-linear-gradient(90deg, #d8b385 0 30px, #c49b6a 30px 32px);
+}
+
+.mg-surface.sink {
+  background: radial-gradient(circle at 50% 60%, #f4c8a8 0 32%, #cfe4f2 33%);
+}
+
+.mg-stain,
+.mg-foam {
+  position: absolute;
+  width: 54px;
+  height: 46px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.mg-stain {
+  background: radial-gradient(circle, #6e4220 0 40%, rgba(110, 66, 32, 0.6) 60%, transparent 70%);
+}
+
+.mg-foam {
+  background: radial-gradient(circle at 35% 35%, #fff 0 30%, #e8f4ff 55%, transparent 70%);
+}
+
+/* ---------- Sofá ---------- */
+
+.mg-sofa {
+  position: absolute;
+  inset: 0 0 50px;
+  background: linear-gradient(#efe3c8 60%, #d8b385 60%);
+}
+
+.mg-sofa-back {
+  position: absolute;
+  left: 30px;
+  right: 30px;
+  top: 90px;
+  height: 90px;
+  border-radius: 30px 30px 0 0;
+  background: #3f7cac;
+}
+
+.mg-sofa-seat {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  top: 170px;
+  height: 60px;
+  border-radius: 20px;
+  background: #2d5c82;
+}
+
+.mg-sleeper {
+  position: absolute;
+  left: 105px;
+  top: 60px;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  background: #f34b7d;
+  border: 4px solid rgba(25, 20, 15, 0.75);
+  z-index: 2;
+  cursor: grab;
+}
+
+.mg-cap {
+  position: absolute;
+  left: 10px;
+  top: -26px;
+  width: 90px;
+  height: 30px;
+  background: #23262e;
+  clip-path: polygon(0 60%, 50% 0, 100% 60%, 50% 100%);
+}
+
+.mg-face {
+  position: absolute;
+  inset: 34px 18px 18px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
+
+.mg-eye {
+  width: 22px;
+  height: 4px;
+  margin-top: 10px;
+  border-radius: 3px;
+  background: #1d1d24;
+}
+
+.mg-face.awake .mg-eye {
+  width: 18px;
+  height: 22px;
+  margin-top: 0;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: inset 0 0 0 6px #fff, inset 0 0 0 11px #1d1d24;
+}
+
+.mg-mouth {
+  width: 26px;
+  height: 8px;
+  border-radius: 0 0 14px 14px;
+  background: #7a2a3a;
+}
+
+.mg-zzz {
+  position: absolute;
+  left: 220px;
+  top: 30px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #2d5c82;
+  animation: zzz 1.6s ease-in-out infinite;
+}
+
+@keyframes zzz {
+  50% {
+    transform: translate(6px, -8px);
+  }
+}
+
+.mg-awake {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 14px;
+  height: 18px;
+  border-radius: 9px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.mg-awake-fill {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, #f2c14e, #e53935);
+}
+
+/* ---------- Elegir ---------- */
+
+.mg-board {
+  position: absolute;
+  inset: 14px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #94592a;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  align-content: start;
+}
+
+.mg-board-row,
+.mg-book,
+.mg-check,
+.mg-code-line,
+.mg-key,
+.mg-switch {
+  font: inherit;
+  cursor: pointer;
+}
+
+.mg-board-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 8px;
+  border: none;
+  border-radius: 4px;
+  background: #fffdf3;
+  font-size: 0.85rem;
+}
+
+.mg-board-row.found {
+  background: #d9f2dc;
+}
+
+.mg-grade {
+  font-weight: 700;
+}
+
+.mg-shelf {
+  position: absolute;
+  inset: 20px 14px 40px;
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  border-bottom: 10px solid #94592a;
+}
+
+.mg-book {
+  flex: 1;
+  border: none;
+  border-radius: 3px 3px 0 0;
+  color: #fff;
+  font-size: 0.6rem;
+  font-weight: 700;
+  writing-mode: vertical-rl;
+}
+
+.mg-book.found {
+  transform: translateY(-14px);
+  box-shadow: 0 0 0 3px #f2c14e;
+}
+
+.mg-ticket {
+  position: absolute;
+  left: 20px;
+  top: 20px;
+  width: 120px;
+  padding: 10px;
+  background: #fff;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.mg-cup {
+  position: absolute;
+  right: 50px;
+  top: 30px;
+  width: 90px;
+  height: 100px;
+  border: 6px solid #fff;
+  border-top: none;
+  border-radius: 0 0 30px 30px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.mg-coffee {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0;
+  background: linear-gradient(#e0c09a, #6e4220);
+  transition: height 1.5s linear;
+}
+
+.mg-coffee.filling {
+  height: 85%;
+}
+
+.mg-options {
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  bottom: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}
+
+.mg-form {
+  position: absolute;
+  inset: 16px;
+  padding: 14px;
+  background: #fff;
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  align-content: start;
+}
+
+.mg-form strong {
+  grid-column: 1 / -1;
+  font-size: 0.9rem;
+}
+
+.mg-check {
+  height: 70px;
+  border: 3px solid #3f7cac;
+  border-radius: 10px;
+  background: #fff;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #2d5c82;
+}
+
+.mg-check.checked {
+  background: #d9f2dc;
+  border-color: #3c9a4e;
+}
+
+.mg-editor {
+  position: absolute;
+  inset: 14px 14px 50px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #23262e;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.mg-code-line {
+  text-align: left;
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: #dfe9ff;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 0.75rem;
+  white-space: pre;
+  padding: 3px 6px;
+}
+
+.mg-code-line.error {
+  background: rgba(229, 57, 53, 0.45);
+  text-decoration: underline wavy #ff6b57;
+}
+
+.mg-code-line.fixed {
+  background: rgba(60, 154, 78, 0.35);
+}
+
+/* ---------- Cables ---------- */
+
+.mg-projector-screen {
+  position: absolute;
+  left: 90px;
+  right: 90px;
+  top: 20px;
+  height: 70px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  background: #23262e;
+  color: #878b90;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.mg-projector-screen.on {
+  background: #fff;
+  color: #2d5c82;
+  box-shadow: 0 0 20px #9fd0ff;
+}
+
+.mg-wires {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.mg-plug {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.mg-plug.left {
+  cursor: grab;
+}
+
+.mg-plug.left.done {
+  cursor: default;
+}
+
+/* ---------- Ajustar ---------- */
+
+.mg-scope {
+  position: absolute;
+  left: 10px;
+  top: 14px;
+  width: 300px;
+  height: 160px;
+  border-radius: 10px;
+  background: #1d2a23;
+}
+
+.mg-wave-ref {
+  fill: none;
+  stroke: #f2c14e;
+  stroke-width: 3;
+  stroke-dasharray: 6 5;
+}
+
+.mg-wave-live {
+  fill: none;
+  stroke: #6fc27b;
+  stroke-width: 3;
+}
+
+.mg-scope.match {
+  box-shadow: 0 0 0 4px #6fc27b;
+}
+
+.mg-slider {
+  position: absolute;
+  left: 30px;
+  right: 30px;
+  bottom: 40px;
+  width: calc(100% - 60px);
+  accent-color: #3c9a4e;
+}
+
+.mg-pot {
+  position: absolute;
+  left: 100px;
+  top: 40px;
+  width: 120px;
+  height: 150px;
+  border-radius: 0 0 26px 26px;
+  border: 6px solid #a85a40;
+  border-top: none;
+  background: rgba(255, 255, 255, 0.5);
+  overflow: hidden;
+}
+
+.mg-water {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 0;
+  background: #7fb0d6;
+}
+
+.mg-water-line {
+  position: absolute;
+  left: -6px;
+  right: -6px;
+  border-top: 3px dashed #2d5c82;
+}
+
+.mg-plant {
+  position: absolute;
+  left: 30px;
+  top: -10px;
+  width: 50px;
+  height: 40px;
+  border-radius: 50%;
+  background: #5f8f4e;
+}
+
+/* ---------- Teclado ---------- */
+
+.mg-keypad {
+  position: absolute;
+  inset: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mg-vending,
+.mg-radon-label {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px 10px;
+  padding: 8px;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.75rem;
+}
+
+.mg-radon-label {
+  display: block;
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 700;
+  background: #f2c14e;
+  border: 3px dashed #1d1d24;
+}
+
+.mg-keypad-screen {
+  padding: 6px;
+  border-radius: 8px;
+  background: #1d1d24;
+  color: #6fc27b;
+  text-align: center;
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 1.3rem;
+  letter-spacing: 4px;
+}
+
+.mg-keys {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.mg-key {
+  height: 40px;
+  border: none;
+  border-radius: 8px;
+  background: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  box-shadow: 0 3px 0 var(--cream-2);
+}
+
+.mg-key:active {
+  transform: translateY(2px);
+}
+
+/* ---------- Interruptores ---------- */
+
+.mg-panel {
+  position: absolute;
+  inset: 20px;
+  border-radius: 12px;
+  background: linear-gradient(#b9bcbf, #878b90);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+}
+
+.mg-bulb {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #555;
+}
+
+.mg-bulb.on {
+  background: #f2c14e;
+  box-shadow: 0 0 30px #f2c14e;
+}
+
+.mg-switches {
+  display: flex;
+  gap: 12px;
+}
+
+.mg-switch {
+  position: relative;
+  width: 36px;
+  height: 80px;
+  border: none;
+  border-radius: 8px;
+  background: #23262e;
+}
+
+.mg-switch::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 4px;
+  height: 34px;
+  border-radius: 6px;
+  background: #e53935;
+  transition: bottom 0.15s;
+}
+
+.mg-switch.up::after {
+  bottom: 42px;
+  background: #6fc27b;
+}

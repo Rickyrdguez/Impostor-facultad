@@ -7,7 +7,7 @@ import * as lobby from '../server/lobby.js';
 import * as actions from '../server/actions.js';
 import * as meeting from '../server/meeting.js';
 import { STATIONS } from '../client/js/places.js';
-import { KILL_COOLDOWN_MS, MEETING_MS, RESULT_MS, TASK_HOLD_MS } from '../server/config.js';
+import { KILL_COOLDOWN_MS, MEETING_MS, RESULT_MS, TASK_MIN_MS } from '../server/config.js';
 
 const T0 = 1_000_000;
 
@@ -80,7 +80,7 @@ test('las tareas se validan por distancia y tiempo, y completarlas gana', () => 
       actions.taskDone(room, p.id, {}, T0 + 100);
       assert.equal(task.done, false, 'demasiado rápido no cuenta');
       actions.taskStart(room, p.id, {}, T0);
-      actions.taskDone(room, p.id, {}, T0 + TASK_HOLD_MS);
+      actions.taskDone(room, p.id, {}, T0 + TASK_MIN_MS);
       assert.equal(task.done, true);
     }
   }

@@ -6,8 +6,7 @@ import {
   KILL_COOLDOWN_MS,
   KILL_RANGE,
   REPORT_RANGE,
-  TASK_HOLD_MS,
-  TASK_TIME_TOLERANCE,
+  TASK_MIN_MS,
   USE_RANGE,
 } from './config.js';
 import { distance, isImpostor, playerList, roomInfo, taskProgress, tasksMessage, toAll } from './info.js';
@@ -58,7 +57,7 @@ export function report(room, id, msg, now) {
   return startMeeting(room, id, body.id, now);
 }
 
-// Empieza a mantener E: se apunta la tarea pendiente más cercana.
+// Abre el minijuego: se apunta la tarea pendiente más cercana.
 export function taskStart(room, id, msg, now) {
   const p = room.players[id];
   if (room.phase !== 'playing' || !p || p.role !== 'crew') return [];
@@ -68,13 +67,13 @@ export function taskStart(room, id, msg, now) {
   return [];
 }
 
-// Termina de mantener E: si ha pasado el tiempo y sigue cerca, la tarea cuenta.
+// Termina el minijuego: si ha pasado el tiempo mínimo y sigue cerca, la tarea cuenta.
 export function taskDone(room, id, msg, now) {
   const p = room.players[id];
   const started = p && p.taskStart;
   if (room.phase !== 'playing' || !started) return [];
   p.taskStart = null;
-  const longEnough = now - started.at >= TASK_HOLD_MS * TASK_TIME_TOLERANCE;
+  const longEnough = now - started.at >= TASK_MIN_MS;
   const close = distance(p, stationOf(started.id)) <= USE_RANGE;
   const task = p.tasks.find((t) => t.id === started.id);
   if (!longEnough || !close || !task || task.done) return [];

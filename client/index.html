@@ -12,6 +12,8 @@
     <link rel="stylesheet" href="css/style.css" />
     <link rel="stylesheet" href="css/game.css" />
     <link rel="stylesheet" href="css/meeting.css" />
+    <link rel="stylesheet" href="css/minigames.css" />
+    <link rel="stylesheet" href="css/minigames2.css" />
   </head>
   <body>
     <canvas id="game"></canvas>
@@ -123,6 +125,18 @@
         </div>
         <canvas id="minimap-canvas"></canvas>
         <p id="map-legend" class="hint"></p>
+      </div>
+    </div>
+
+    <!-- Minijuego de una tarea o de un sabotaje -->
+    <div id="minigame" class="overlay hidden">
+      <div class="card minigame-card">
+        <div class="minigame-head">
+          <h2 id="minigame-title"></h2>
+          <button id="minigame-close" class="btn small ghost" aria-label="Cerrar">✕</button>
+        </div>
+        <p id="minigame-hint" class="minigame-hint"></p>
+        <div id="minigame-stage" class="minigame-stage"></div>
       </div>
     </div>
 

@@ -3,9 +3,10 @@
 
 import { state, amAlive, myInfo, phase, playerInfo } from './state.js';
 import * as net from './network.js';
-import { EMERGENCY, STATIONS, VENTS } from './places.js';
+import { EMERGENCY, FIX_POINTS, STATIONS, VENTS } from './places.js';
 import { pendingFixPoints } from './sabotageui.js';
-import { KILL_RANGE, REPORT_RANGE, TASK_HOLD_MS, USE_RANGE } from '../../shared/constants.js';
+import { openMinigame } from './minigames/index.js';
+import { KILL_RANGE, REPORT_RANGE, USE_RANGE, sabotageById, taskById } from '../../shared/constants.js';
 
 const dist = (a, x, y) => Math.hypot(a.x - x, a.y - y);
 
@@ -74,44 +75,35 @@ export function useTarget() {
   return options[0] || null;
 }
 
+// Tarea: abre su minijuego. Al terminarlo cuenta (o se finge, si es el impostor).
+function startTask(id) {
+  if (state.role === 'crew') net.send({ t: 'task-start' });
+  openMinigame(id, taskById(id).name, () => {
+    if (state.role === 'crew') net.send({ t: 'task-done' });
+    else state.fakeDone.add(id);
+  });
+}
+
+// Punto de sabotaje: su minijuego y, al terminar, se avisa al servidor.
+function startFix(id) {
+  const point = FIX_POINTS.find((p) => p.id === id);
+  const title = `${sabotageById(point.sabotage).fixTitle} · ${point.room}`;
+  openMinigame(id, title, () => net.send({ t: 'fix', point: id }));
+}
+
 function startUse() {
   const target = useTarget();
   if (!target) return;
   if (target.kind === 'emergency') return net.send({ t: 'emergency' });
   if (target.kind === 'vent') return net.send({ t: 'vent' });
-  state.hold = { kind: target.kind, id: target.id, start: performance.now() };
-  if (target.kind === 'task' && state.role === 'crew') net.send({ t: 'task-start' });
+  if (target.kind === 'task') return startTask(target.id);
+  if (target.kind === 'fix') startFix(target.id);
 }
 
 // Botones y teclas llaman aquí: name = 'use' | 'kill' | 'report'.
 export function act(name, down) {
-  if (name === 'use') {
-    if (down) startUse();
-    else state.hold = null; // soltar antes de tiempo cancela la tarea
-    return;
-  }
   if (!down) return;
+  if (name === 'use') startUse();
   if (name === 'kill' && killTarget()) net.send({ t: 'kill' });
   if (name === 'report' && reportTarget()) net.send({ t: 'report' });
-}
-
-// Progreso de la tarea en curso (0 a 1), o null si no hay.
-export function holdProgress() {
-  if (!state.hold) return null;
-  return Math.min(1, (performance.now() - state.hold.start) / TASK_HOLD_MS);
-}
-
-// Cada fotograma: termina la tarea si se ha mantenido el tiempo suficiente.
-export function updateActions() {
-  if (!state.hold) return;
-  if (!playing()) {
-    state.hold = null;
-    return;
-  }
-  if (holdProgress() < 1) return;
-  const { id, kind } = state.hold;
-  state.hold = null;
-  if (kind === 'fix') net.send({ t: 'fix', point: id });
-  else if (state.role === 'crew') net.send({ t: 'task-done' });
-  else state.fakeDone.add(id); // el impostor solo finge
 }

@@ -9,6 +9,7 @@ import * as end from './endscreen.js';
 import { renderLobby } from './lobby.js';
 import { onSnapshot, setMyPosition } from './players.js';
 import { onVent } from './ventui.js';
+import { closeMinigame } from './minigames/index.js';
 import { toggleMinimap } from './minimap.js';
 import { clearSabotage, onSabotage, onSabotageCooldown } from './sabotageui.js';
 
@@ -16,6 +17,7 @@ let lastPhase = null;
 
 // Cambio de fase de la sala: qué pantallas se abren o se cierran.
 function onPhaseChange(now) {
+  if (now !== 'playing') closeMinigame();
   if (now !== 'playing') {
     onVent(null);
     toggleMinimap(false);
@@ -80,7 +82,7 @@ net.on('cooldown', (m) => (state.killReadyAt = performance.now() + m.ms));
 net.on('killed', () => ui.toast('¡Te han eliminado! Ahora eres un fantasma.'));
 
 net.on('meeting', (m) => {
-  state.hold = null;
+  closeMinigame();
   meeting.openMeeting(m);
 });
 
@@ -100,6 +102,7 @@ net.on('vent', (m) => onVent(m.id));
 net.on('sabotage', (m) => {
   const wasWifi = state.sabotage?.kind === 'wifi';
   onSabotage(m);
+  if (!m.kind) closeMinigame();
   if (wasWifi || m.kind === 'wifi') hud.renderTasks();
 });
 

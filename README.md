@@ -91,22 +91,34 @@ también recupera la partida (dentro de esos 30 s y en la misma pestaña).
 | Acción | Teclado | Móvil |
 | --- | --- | --- |
 | Moverse | WASD o flechas | Joystick (toca la mitad izquierda) |
-| Hacer una tarea | Mantener E cerca de la estación | Mantener **Usar** |
+| Usar (tarea, botón de emergencia, trampilla, arreglar sabotaje) | E | **Usar** |
 | Matar (impostor) | Q | **Matar** |
 | Reportar un cuerpo | R | **Reportar** |
+| Sabotear (impostor) | F | **Sabotear** |
+| Ver el mapa | M | **Mapa** |
 
 ## Cómo se juega
 
 - Entre 3 y 10 jugadores. El anfitrión crea la sala y pasa el código; cada
   uno elige su lenguaje en **Elegir lenguaje** y el anfitrión pulsa **Empezar**.
 - Hay un impostor. Los demás son tripulantes y tienen 3 tareas repartidas por
-  la facultad (las marca una flecha amarilla). Si el equipo completa todas,
-  ganan los tripulantes.
+  la facultad (las marca una flecha amarilla y salen en el mapa con la M).
+  Cada tarea es un minijuego: despertar al que duerme en el sofá, fotocopiar
+  apuntes, conectar los cables del proyector, pedir un barraquito…
+  Si el equipo completa todas, ganan los tripulantes.
 - El impostor mata con Q (cada 15 s) y deja un cuerpo. Quien lo encuentre lo
   reporta con R y empieza una reunión: 40 s para hablar por chat y votar.
   El más votado sale expulsado (con empate, nadie).
+- Botón de emergencia en la mesa del gran pasillo: cada jugador puede
+  convocar una reunión una vez por partida.
+- El impostor puede moverse por trampillas (baños-laboratorio,
+  secretaría-cafetería, relax-estudio, ascensor-clase-terraza) y sabotear:
+  tirar el wifi (nadie ve sus tareas), apagar las luces (los tripulantes casi
+  no ven) o provocar una fuga de radón (hay que cerrarla en el Laboratorio y
+  en Secretaría antes de 45 s o gana el impostor).
 - Ganan los tripulantes si expulsan al impostor o terminan las tareas. Gana
-  el impostor si quedan tantos impostores como tripulantes.
+  el impostor si quedan tantos impostores como tripulantes o si el radón no
+  se cierra a tiempo.
 - Los muertos son fantasmas: atraviesan paredes, lo ven todo y, si eran
   tripulantes, pueden seguir haciendo tareas.
 - Para probar con dos pestañas, baja `MIN_PLAYERS` en `server/config.js`.

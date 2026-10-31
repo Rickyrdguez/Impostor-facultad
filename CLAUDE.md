@@ -22,7 +22,8 @@ Ingeniería y Tecnología (ULL). Se juega online desde cualquier red.
 - Las reglas están repartidas en módulos puros: `game.js` (jugadores,
   movimiento, tick, reconexión), `lobby.js` (lenguaje, empezar, volver a la
   sala), `actions.js` (matar, reportar, tareas), `meeting.js` (chat, votos),
-  `victory.js` (victoria) e `info.js` (consultas y mensajes comunes).
+  `victory.js` (victoria), `vents.js` (trampillas), `sabotage.js` (sabotajes)
+  e `info.js` (consultas y mensajes comunes).
   Sin imports circulares.
 - Secretos: los roles solo van en el mensaje privado `role`; los vivos no
   reciben la posición de los fantasmas (`tick` manda dos snapshots).
@@ -36,6 +37,14 @@ Ingeniería y Tecnología (ULL). Se juega online desde cualquier red.
   `hud` (tareas, progreso, botones, banner), `actions` (E/Q/R), `markers`
   (cuerpos, marcas, anillo), `meeting`, `endscreen`, `match` (mensajes de
   la partida). CSS en `style.css`, `game.css` y `meeting.css`.
+- `client/js/places.js`: puntos interactivos (estaciones, trampillas, botón de
+  emergencia, puntos de arreglo de sabotajes). Datos puros, como map.js.
+- Minijuegos en `client/js/minigames/`: `index.js` (ventana y registro
+  id -> minijuego), `kit.js` (ayudas) y un archivo por tipo (waiting,
+  dragging, rubbing, picking, wires, tuning, keypad, switches). Cada
+  minijuego recibe un contexto `g` y llama a `g.finish()` al superarlo.
+  El servidor solo exige estar cerca y `TASK_MIN_MS` entre abrir y terminar.
+- Más módulos de cliente: `minimap` (tecla M), `ventui`, `sabotageui`.
 - `client/js/map.js` es datos + colisiones puras (sin DOM). Lo importan el
   cliente y el servidor (el servidor valida movimiento y distancias).
 - `shared/constants.js`: lo que usan servidor y cliente (lenguajes, tareas,

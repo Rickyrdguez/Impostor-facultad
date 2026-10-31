@@ -19,15 +19,15 @@ export const VISION_IMPOSTOR = 400;
 export const USE_RANGE = 80; // distancia para hacer una tarea
 export const KILL_RANGE = 90; // distancia para matar
 export const REPORT_RANGE = 110; // distancia para reportar un cuerpo
-export const TASK_HOLD_MS = 1200; // mantener E para completar una tarea
+export const TASK_MIN_MS = 500; // tiempo mínimo entre abrir y terminar un minijuego
 export const CHAT_MAX_LENGTH = 120;
 
 // Sabotajes del impostor
 export const LIGHTS_VISION = 110; // radio de visión de los tripulantes con las luces apagadas
 export const SABOTAGES = [
-  { id: 'wifi', name: 'Tirar el wifi', alarm: '¡Se ha caído el wifi!', fix: 'Reinícialo en el armario de red (Exterior)' },
-  { id: 'luces', name: 'Apagar las luces', alarm: '¡Se han ido las luces!', fix: 'Sube los interruptores del cuadro (Pasillo)' },
-  { id: 'radon', name: 'Fuga de radón', alarm: '¡Fuga de radón!', fix: 'Ciérrala en el Laboratorio y en Secretaría' },
+  { id: 'wifi', name: 'Tirar el wifi', alarm: '¡Se ha caído el wifi!', fixTitle: 'Reiniciar la red', fix: 'Reinícialo en el armario de red (Exterior)' },
+  { id: 'luces', name: 'Apagar las luces', alarm: '¡Se han ido las luces!', fixTitle: 'Cuadro eléctrico', fix: 'Sube los interruptores del cuadro (Pasillo)' },
+  { id: 'radon', name: 'Fuga de radón', alarm: '¡Fuga de radón!', fixTitle: 'Cerrar la válvula', fix: 'Ciérrala en el Laboratorio y en Secretaría' },
 ];
 
 export function sabotageById(id) {

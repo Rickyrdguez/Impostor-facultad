@@ -3,7 +3,7 @@
 import { MAP } from './map.js';
 import { buildMapCanvas } from './mapview.js';
 import { drawCharacter } from './characters.js';
-import { drawCorpse, drawTaskMarker, drawTaskRing } from './markers.js';
+import { drawCorpse, drawTaskMarker } from './markers.js';
 import { PALETTE } from './palette.js';
 import { buildVisionGrid, visibilityPolygon, canSee } from './vision.js';
 import { PLAYER_RADIUS } from '../../shared/constants.js';
@@ -98,7 +98,6 @@ function isVisible(c, view) {
 //   vision: radio de visión, o Infinity si no hay niebla (fantasmas, inicio)
 //   characters: personajes a dibujar   bodies: cuerpos [{ x, y, lang }]
 //   markers: estaciones de mis tareas [[x, y]]   alerts: puntos de sabotaje [[x, y]]
-//   ring: progreso de la tarea (0-1) o null
 // }
 export function render(view) {
   const s = cameraScale();
@@ -113,7 +112,6 @@ export function render(view) {
   for (const b of (view.bodies || []).filter((b) => isVisible(b, view))) drawCorpse(ctx, b, b.lang);
   const visible = view.characters.filter((c) => isVisible(c, view)).sort((a, b) => a.y - b.y);
   for (const c of visible) drawCharacter(ctx, c);
-  if (view.ring !== null && view.ring !== undefined) drawTaskRing(ctx, view.cx, view.cy, view.ring);
 
   if (Number.isFinite(view.vision) && mapCanvas) drawFog(view, transform);
 

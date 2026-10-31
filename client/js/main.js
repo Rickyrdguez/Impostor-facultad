@@ -14,7 +14,8 @@ import { bindEnd } from './endscreen.js';
 import { bindMinimap, toggleMinimap, updateMinimap } from './minimap.js';
 import { bindVentPanel } from './ventui.js';
 import { bindSabotage, openMenu, pendingFixPoints, updateSabotage } from './sabotageui.js';
-import { act, holdProgress, pendingTasks, updateActions } from './actions.js';
+import { act, pendingTasks } from './actions.js';
+import { bindMinigames, isMinigameOpen } from './minigames/index.js';
 import './match.js';
 import { MAP } from './map.js';
 import { STATIONS } from './places.js';
@@ -68,7 +69,6 @@ function gameView() {
     bodies,
     markers,
     alerts,
-    ring: holdProgress(),
   };
 }
 
@@ -86,7 +86,7 @@ function homeView(now) {
 // Solo se anda si no hay reunión ni pantalla final y no se está haciendo una tarea.
 function canWalk() {
   const p = phase();
-  return net.isOpen() && !state.hold && !state.vent && !isMeetingOpen() && (p === 'lobby' || p === 'playing');
+  return net.isOpen() && !isMinigameOpen() && !state.vent && !isMeetingOpen() && (p === 'lobby' || p === 'playing');
 }
 
 function frame(now) {
@@ -95,7 +95,6 @@ function frame(now) {
   if (state.screen === 'game' && state.me.placed) {
     if (canWalk()) updateMe(dt, !amAlive());
     updateOthers();
-    updateActions();
     updateButtons();
     updateMeeting();
     updateSabotage();
@@ -125,6 +124,7 @@ async function start() {
   bindMinimap();
   bindVentPanel();
   bindSabotage();
+  bindMinigames();
   tryResume();
   // Espera a la fuente para que los nombres del suelo salgan con Fredoka.
   const timeout = new Promise((r) => setTimeout(r, FONT_TIMEOUT_MS));
