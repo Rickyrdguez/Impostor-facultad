@@ -23,7 +23,8 @@ Ingeniería y Tecnología (ULL). Se juega online desde cualquier red.
   sockets, tokens, reconexión) y `server/messages.js` (parseo y validación).
 - Cliente: `main` (bucle), `network`, `input`, `state`, `players` (movimiento
   propio + interpolación), `render` (cámara, oscuridad), `mapview` (mapa
-  pre-dibujado en un canvas aparte), `furniture`, `characters`, `ui`, `palette`.
+  pre-dibujado en un canvas aparte), `vision` (línea de visión por rayos, pura),
+  `furniture`, `characters`, `ui`, `palette`.
 - `client/js/map.js` es datos + colisiones puras (sin DOM). Lo importan el
   cliente y el servidor (el servidor valida movimiento y distancias).
 - `shared/constants.js`: lo que usan servidor y cliente (lenguajes, tareas,
@@ -50,8 +51,20 @@ Ingeniería y Tecnología (ULL). Se juega online desde cualquier red.
   (muebles), ladrillo y gris hormigón (paredes), toque de azul.
 - Personajes dibujados por código: círculo con birrete + insignia del
   lenguaje (color + letras). Nada de logos oficiales.
-- Oscuridad: radio de visión con degradado; el impostor ve más; los
-  fantasmas lo ven todo.
+- Visión dinámica: rayos desde el jugador que se cortan en paredes y muebles
+  altos (`OPAQUE_KINDS` en map.js); lo que queda detrás no se ve y los
+  jugadores ocultos no se dibujan. La niebla se dibuja a baja resolución y se
+  escala (borde suave sin `ctx.filter`, que es caro). El impostor ve más
+  lejos; los fantasmas lo ven todo.
+
+## Mapa (fiel al plano de la ESIT)
+- Arriba secretaría y zona relax con el patio en medio; debajo el gran pasillo.
+- Del gran pasillo baja un pasillo a la cafetería con los baños a un lado y el
+  ascensor al otro (cada uno un cuarto con una sola puerta al pasillo).
+- La clase solo tiene su entrada real: arriba a la izquierda, desde el gran pasillo.
+- Cafetería redonda con lucernario central y anillo de mesas.
+- Añadidos para jugabilidad: laboratorio, sala de estudio, terraza y un
+  pasillo exterior a la derecha (segundo camino entre arriba y abajo).
 
 ## Fases
 1. Estructura, servidor, sala, movimiento, mapa con estilo y oscuridad.

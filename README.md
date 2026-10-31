@@ -6,7 +6,7 @@ es un lenguaje de programación con birrete; uno de ellos es el impostor.
 
 > Proyecto en desarrollo por fases. Ahora mismo (fase 1): salas con código,
 > movimiento por el mapa de la facultad con colisiones, varios jugadores
-> viéndose entre sí y visión limitada con oscuridad.
+> viéndose entre sí y visión dinámica (las paredes tapan la vista).
 
 ## Ejecutar en local
 
@@ -36,8 +36,8 @@ Al arrancar, el servidor imprime también las IPs de tu red local
 npm test
 ```
 
-Comprueban el mapa (todas las salas conectadas) y el servidor con clientes
-WebSocket simulados.
+Comprueban el mapa (todas las salas conectadas), la línea de visión y el
+servidor con clientes WebSocket simulados.
 
 ## Estructura
 
@@ -45,7 +45,7 @@ WebSocket simulados.
 server/   index.js (http + ws), rooms.js (salas), messages.js (validación),
           game.js (reglas, lógica pura), config.js (constantes)
 client/   index.html, css/, js/ (main, network, input, map, render,
-          mapview, furniture, characters, players, ui, state, palette)
+          mapview, vision, furniture, characters, players, ui, state, palette)
 shared/   constants.js (lo que usan servidor y cliente)
 tests/    tests con node:test y clientes simulados
 ```

@@ -2,34 +2,35 @@
 // Módulo puro: sin DOM. Lo usan el cliente y el servidor.
 // Rectángulos: [x, y, ancho, alto]. Círculos: [cx, cy, radio].
 
-export const MAP = { width: 1800, height: 2420, spawn: { x: 900, y: 790 } };
+export const MAP = { width: 1800, height: 2340, spawn: { x: 900, y: 790 } };
 
 // Salas: suelo transitable con nombre y estilo de suelo.
+// Se dibujan en este orden: las que solapan van antes de la sala que las tapa.
 export const ROOMS = [
   { id: 'secretaria', name: 'Secretaría', rect: [100, 80, 540, 520], floor: 'crema', label: [370, 470] },
   { id: 'pasarela', name: 'Pasarela', rect: [680, 80, 440, 120], floor: 'baldosa' },
   { id: 'relax', name: 'Zona relax', rect: [1160, 80, 540, 520], floor: 'madera', label: [1430, 560] },
+  // Pasillo real de la facultad: baja del gran pasillo a la cafetería
+  { id: 'pasillo', name: 'Pasillo', rect: [460, 930, 180, 530], floor: 'baldosa', label: [550, 1330] },
+  { id: 'exterior', name: 'Exterior', rect: [1600, 930, 100, 520], floor: 'piedra', label: [1650, 1190] },
   { id: 'hall', name: 'Gran pasillo', rect: [100, 640, 1600, 300], floor: 'baldosa' },
-  { id: 'banos', name: 'Baños', rect: [100, 980, 340, 360], floor: 'azul' },
-  { id: 'ascensor', name: 'Ascensor', rect: [480, 980, 380, 420], floor: 'terrazo' },
-  { id: 'clase', name: 'Clase', rect: [900, 980, 540, 420], floor: 'madera', label: [1170, 1355] },
-  { id: 'reprografia', name: 'Reprografía', rect: [1480, 980, 220, 420], floor: 'crema' },
-  { id: 'laboratorio', name: 'Laboratorio', rect: [100, 1480, 360, 420], floor: 'azul', label: [280, 1525] },
-  { id: 'estudio', name: 'Sala de estudio', rect: [1340, 1480, 360, 420], floor: 'crema' },
-  { id: 'cafeteria', name: 'Cafetería', circle: [900, 1820, 380], floor: 'baldosa', label: [900, 1650] },
-  { id: 'terraza', name: 'Terraza', rect: [100, 2240, 1600, 120], floor: 'piedra' },
+  { id: 'banos', name: 'Baños', rect: [100, 1000, 320, 300], floor: 'azul', label: [260, 1150] },
+  { id: 'ascensor', name: 'Ascensor', rect: [680, 1000, 220, 220], floor: 'terrazo', label: [770, 1180] },
+  { id: 'clase', name: 'Clase', rect: [940, 980, 620, 270], floor: 'madera', label: [1250, 1225] },
+  { id: 'laboratorio', name: 'Laboratorio', rect: [100, 1480, 240, 480], floor: 'azul', label: [220, 1515] },
+  { id: 'estudio', name: 'Sala de estudio', rect: [1260, 1440, 440, 520], floor: 'crema' },
+  { id: 'cafeteria', name: 'Cafetería', circle: [800, 1700, 420], floor: 'baldosa', label: [800, 1515] },
+  { id: 'terraza', name: 'Terraza', rect: [100, 2160, 1600, 120], floor: 'piedra' },
 ];
 
-// Puertas y pasillos cortos que unen salas (también son suelo).
+// Puertas que unen salas (también son suelo).
 export const DOORS = [
   [630, 100, 60, 80], [1110, 100, 60, 80], // pasarela norte
-  [300, 590, 120, 60], [1380, 590, 120, 60], // secretaría y relax al pasillo
-  [220, 930, 100, 60], [600, 930, 140, 60], [1080, 930, 120, 60], [1540, 930, 100, 60],
-  [430, 1120, 60, 100], [850, 1200, 60, 100], [1430, 1150, 60, 100],
-  [760, 1390, 100, 110], [940, 1390, 100, 110], // a la cafetería
-  [220, 1330, 100, 160], [1350, 1390, 80, 100],
-  [450, 1730, 120, 100], [1230, 1730, 120, 100], // laterales de la cafetería
-  [220, 1890, 100, 360], [1480, 1890, 100, 360], [850, 2170, 100, 80], // terraza
+  [300, 590, 120, 60], [1380, 590, 120, 60], // secretaría y relax al gran pasillo
+  [960, 930, 120, 60], // única entrada de la clase
+  [410, 1100, 60, 100], [630, 1060, 60, 100], // baños y ascensor al pasillo
+  [330, 1650, 80, 100], [1200, 1650, 70, 100], // laterales de la cafetería
+  [170, 1950, 100, 220], [1450, 1950, 100, 220], [750, 2100, 100, 70], // terraza
 ];
 
 // Muebles y objetos que bloquean el paso.
@@ -50,32 +51,40 @@ export const OBSTACLES = [
   { kind: 'banco', rect: [1230, 775, 150, 30] },
   { kind: 'columna', circle: [700, 790, 20] },
   { kind: 'columna', circle: [1100, 790, 20] },
-  // Baños, ascensor, clase, reprografía
-  { kind: 'lavabo', rect: [110, 1050, 40, 200] },
-  { kind: 'ascensor', rect: [490, 990, 90, 70] },
-  { kind: 'ascensor', rect: [760, 990, 90, 70] },
-  { kind: 'mesa', rect: [1250, 1000, 130, 40] },
-  ...desks(960, 1080, 3, 3),
-  { kind: 'maquina', rect: [1635, 1060, 55, 70] },
-  { kind: 'maquina', rect: [1635, 1180, 55, 70] },
-  { kind: 'mesa', rect: [1500, 1310, 120, 40] },
+  // Baños: lavabos y cubículos
+  { kind: 'lavabo', rect: [110, 1030, 40, 170] },
+  { kind: 'mampara', rect: [200, 1215, 10, 85] },
+  { kind: 'mampara', rect: [280, 1215, 10, 85] },
+  { kind: 'mampara', rect: [360, 1215, 10, 85] },
+  // Zona del ascensor
+  { kind: 'ascensor', rect: [850, 1020, 40, 80] },
+  { kind: 'ascensor', rect: [850, 1125, 40, 80] },
+  { kind: 'maceta', circle: [715, 1035, 18] },
+  // Clase: pupitres y mesa del profesor
+  ...desks(1060, 1060, 3, 2),
+  { kind: 'mesa', rect: [1470, 1030, 40, 140] },
   // Laboratorio y sala de estudio
-  { kind: 'mesa', rect: [140, 1560, 200, 40] },
-  { kind: 'mesa', rect: [140, 1680, 200, 40] },
-  { kind: 'mesa', rect: [140, 1800, 200, 40] },
-  { kind: 'mesa', rect: [1400, 1560, 120, 60] },
-  { kind: 'mesa', rect: [1570, 1560, 100, 60] },
-  { kind: 'mesa', rect: [1420, 1720, 120, 60] },
-  { kind: 'armario', rect: [1655, 1690, 35, 180] },
+  { kind: 'mesa', rect: [130, 1560, 140, 36] },
+  { kind: 'mesa', rect: [130, 1690, 140, 36] },
+  { kind: 'mesa', rect: [130, 1820, 140, 36] },
+  { kind: 'mesa', rect: [1340, 1540, 120, 60] },
+  { kind: 'mesa', rect: [1510, 1540, 100, 60] },
+  { kind: 'mesa', rect: [1340, 1720, 120, 60] },
+  { kind: 'mesa', rect: [1510, 1720, 120, 60] },
+  { kind: 'armario', rect: [1660, 1800, 30, 140] },
   // Cafetería: lucernario central y mesas en anillo
-  { kind: 'lucernario', circle: [900, 1820, 120] },
-  ...ringTables(900, 1820, 250, 6),
+  { kind: 'lucernario', circle: [800, 1700, 130] },
+  ...ringTables(800, 1700, 275, 7),
   // Terraza
-  { kind: 'maceta', circle: [420, 2335, 18] },
-  { kind: 'maceta', circle: [700, 2335, 18] },
-  { kind: 'maceta', circle: [1100, 2335, 18] },
-  { kind: 'maceta', circle: [1380, 2335, 18] },
+  { kind: 'maceta', circle: [420, 2255, 18] },
+  { kind: 'maceta', circle: [620, 2255, 18] },
+  { kind: 'maceta', circle: [1000, 2255, 18] },
+  { kind: 'maceta', circle: [1300, 2255, 18] },
 ];
+
+// Objetos altos que tapan la vista (el resto son bajos y se ve por encima).
+export const OPAQUE_KINDS = new Set(['armario', 'maquina', 'ascensor', 'columna', 'lucernario', 'mampara']);
+
 
 // Decoración que no es suelo (no se puede pisar).
 export const DECOR = [{ kind: 'patio', name: 'Patio', rect: [680, 240, 440, 360] }];
@@ -85,7 +94,7 @@ function desks(x0, y0, cols, rows) {
   const out = [];
   for (let r = 0; r < rows; r++) {
     for (let c = 0; c < cols; c++) {
-      out.push({ kind: 'pupitre', rect: [x0 + c * 150, y0 + r * 90, 100, 30] });
+      out.push({ kind: 'pupitre', rect: [x0 + c * 150, y0 + r * 80, 100, 30] });
     }
   }
   return out;
@@ -116,6 +125,12 @@ function inCircle(px, py, [cx, cy, r]) {
 
 function inShape(px, py, s) {
   return s.rect ? inRect(px, py, s.rect) : inCircle(px, py, s.circle);
+}
+
+// ¿Este punto tapa la vista? (paredes y muebles altos)
+export function blocksSight(px, py) {
+  if (!isFloor(px, py)) return true;
+  return OBSTACLES.some((o) => OPAQUE_KINDS.has(o.kind) && inShape(px, py, o));
 }
 
 // ¿Este punto es suelo?

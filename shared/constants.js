@@ -11,8 +11,8 @@ export const SEND_RATE_MS = 50; // el cliente manda su posición ~20 veces/s
 export const INTERP_DELAY_MS = 100; // retraso de interpolación de los demás
 
 // Visión (radio en unidades del mundo)
-export const VISION_CREW = 260;
-export const VISION_IMPOSTOR = 350;
+export const VISION_CREW = 300;
+export const VISION_IMPOSTOR = 400;
 
 // Lenguajes elegibles como personaje: color característico + letras.
 // ink = color de las letras de la insignia para que se lean bien.
