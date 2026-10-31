@@ -17,6 +17,7 @@ export const IMPOSTORS = 1;
 // Reglas de la partida
 export const TASKS_PER_PLAYER = 3;
 export const KILL_COOLDOWN_MS = 15000;
+export const EMERGENCY_COOLDOWN_MS = 15000; // tras empezar y tras cada reunión
 export const MEETING_MS = 40000; // tiempo para hablar y votar
 export const RESULT_MS = 6000; // tiempo mostrando el resultado de la votación
 export const CHAT_COOLDOWN_MS = 700; // entre dos mensajes del mismo jugador

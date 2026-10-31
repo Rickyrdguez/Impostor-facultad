@@ -11,9 +11,12 @@ import { bindLobby } from './lobby.js';
 import { bindHud, updateButtons } from './hud.js';
 import { bindMeeting, isMeetingOpen, updateMeeting } from './meeting.js';
 import { bindEnd } from './endscreen.js';
+import { bindMinimap, toggleMinimap, updateMinimap } from './minimap.js';
+import { bindVentPanel } from './ventui.js';
 import { act, holdProgress, pendingTasks, updateActions } from './actions.js';
 import './match.js';
-import { MAP, STATIONS } from './map.js';
+import { MAP } from './map.js';
+import { STATIONS } from './places.js';
 import { SEND_RATE_MS, VISION_CREW, VISION_IMPOSTOR } from '../../shared/constants.js';
 
 const MAX_DT = 0.1; // s; evita saltos si la pestaña estuvo parada
@@ -40,7 +43,7 @@ function characters() {
     if (info) list.push({ ...o, name: info.name, lang: info.lang, ghost: !info.alive });
   }
   const me = playerInfo(state.myId);
-  if (me && state.me.placed) list.push({ ...state.me, name: me.name, lang: me.lang, ghost: !me.alive });
+  if (me && state.me.placed && !state.vent) list.push({ ...state.me, name: me.name, lang: me.lang, ghost: !me.alive });
   return list;
 }
 
@@ -78,7 +81,7 @@ function homeView(now) {
 // Solo se anda si no hay reunión ni pantalla final y no se está haciendo una tarea.
 function canWalk() {
   const p = phase();
-  return net.isOpen() && !state.hold && !isMeetingOpen() && (p === 'lobby' || p === 'playing');
+  return net.isOpen() && !state.hold && !state.vent && !isMeetingOpen() && (p === 'lobby' || p === 'playing');
 }
 
 function frame(now) {
@@ -92,6 +95,7 @@ function frame(now) {
     updateMeeting();
     sendPosition(now);
     render(gameView());
+    updateMinimap(now);
   } else {
     render(homeView(now));
     ui.drawLogo(now);
@@ -102,12 +106,14 @@ function frame(now) {
 async function start() {
   initRender(document.getElementById('game'));
   initInput(ui.els.stick, ui.els.knob);
-  setActionHandler(act);
+  setActionHandler((name, down) => (name === 'map' ? down && toggleMinimap() : act(name, down)));
   bindHome();
   bindLobby();
   bindHud();
   bindMeeting();
   bindEnd();
+  bindMinimap();
+  bindVentPanel();
   tryResume();
   // Espera a la fuente para que los nombres del suelo salgan con Fredoka.
   const timeout = new Promise((r) => setTimeout(r, FONT_TIMEOUT_MS));

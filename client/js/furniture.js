@@ -111,10 +111,30 @@ export function drawStation(ctx, [x, y]) {
   ctx.fillRect(x - 6, y - 4, 5, 2);
 }
 
+// Trampilla: rejilla metálica en el suelo.
+export function drawVent(ctx, x, y) {
+  drawBox(ctx, [x - 20, y - 14, 40, 28], [PALETTE.metalDark, '#5f6368', PALETTE.metal]);
+  ctx.strokeStyle = '#4a4e53';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  for (let i = -12; i <= 12; i += 8) {
+    ctx.moveTo(x + i, y - 9);
+    ctx.lineTo(x + i, y + 5);
+  }
+  ctx.stroke();
+}
+
+// Mesa redonda con el gran botón rojo de emergencia.
+function drawEmergency(ctx, [cx, cy, r]) {
+  drawRound(ctx, [cx, cy, r], FURNITURE.mesa);
+  drawRound(ctx, [cx, cy - 3, r * 0.55], [PALETTE.brick, '#7a3826', '#e38a6e']);
+}
+
 export function drawObstacle(ctx, o) {
   if (o.kind === 'patio') return drawPatio(ctx, o.rect);
   if (o.kind === 'lucernario') return drawSkylight(ctx, o.circle);
   if (o.kind === 'maceta') return drawPlant(ctx, o.circle);
+  if (o.kind === 'emergencia') return drawEmergency(ctx, o.circle);
   const colors = FURNITURE[o.kind] || FURNITURE.mesa;
   if (o.circle) drawRound(ctx, o.circle, colors);
   else drawBox(ctx, o.rect, colors);

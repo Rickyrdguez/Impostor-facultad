@@ -1,9 +1,9 @@
-// Acciones del jugador: usar (mantener E), matar (Q) y reportar (R).
+// Acciones del jugador: usar (E: tarea, botón de emergencia o trampilla), matar (Q) y reportar (R).
 // El cliente solo decide si mostrar el botón activo; el servidor valida todo.
 
-import { state, amAlive, phase, playerInfo } from './state.js';
+import { state, amAlive, myInfo, phase, playerInfo } from './state.js';
 import * as net from './network.js';
-import { STATIONS } from './map.js';
+import { EMERGENCY, STATIONS, VENTS } from './places.js';
 import { KILL_RANGE, REPORT_RANGE, TASK_HOLD_MS, USE_RANGE } from '../../shared/constants.js';
 
 const dist = (a, x, y) => Math.hypot(a.x - x, a.y - y);
@@ -32,7 +32,7 @@ export function killCooldownMs() {
 
 // ¿Hay alguien a quien matar? Solo cuenta a los vivos que no son aliados.
 export function killTarget() {
-  if (!playing() || state.role !== 'impostor' || !amAlive() || killCooldownMs() > 0) return null;
+  if (!playing() || state.role !== 'impostor' || !amAlive() || state.vent || killCooldownMs() > 0) return null;
   for (const [id, o] of state.others) {
     const info = playerInfo(id);
     if (info?.alive && !state.allies.includes(id) && dist(state.me, o.x, o.y) <= KILL_RANGE) return id;
@@ -45,10 +45,34 @@ export function reportTarget() {
   return state.bodies.find((b) => dist(state.me, b.x, b.y) <= REPORT_RANGE) || null;
 }
 
-function startUse() {
+// Lo más cercano que se puede usar con E: { kind: 'task' | 'emergency' | 'vent', id } o null.
+export function useTarget() {
+  if (state.vent) return { kind: 'vent', id: state.vent }; // dentro: E para salir
+  if (!playing()) return null;
+  const options = [];
   const task = nearestTask();
-  if (!task) return;
-  state.hold = { id: task.id, start: performance.now() };
+  if (task) options.push({ kind: 'task', id: task.id, d: task.d });
+  const me = myInfo();
+  if (amAlive() && me && !me.buttonUsed) {
+    const d = dist(state.me, EMERGENCY.x, EMERGENCY.y);
+    if (d <= USE_RANGE) options.push({ kind: 'emergency', id: 'emergency', d });
+  }
+  if (amAlive() && state.role === 'impostor') {
+    for (const v of VENTS) {
+      const d = dist(state.me, v.x, v.y);
+      if (d <= USE_RANGE) options.push({ kind: 'vent', id: v.id, d });
+    }
+  }
+  options.sort((a, b) => a.d - b.d);
+  return options[0] || null;
+}
+
+function startUse() {
+  const target = useTarget();
+  if (!target) return;
+  if (target.kind === 'emergency') return net.send({ t: 'emergency' });
+  if (target.kind === 'vent') return net.send({ t: 'vent' });
+  state.hold = { id: target.id, start: performance.now() };
   if (state.role === 'crew') net.send({ t: 'task-start' });
 }
 

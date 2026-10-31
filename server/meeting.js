@@ -1,9 +1,17 @@
 // Reuniones: chat, votación con temporizador y expulsión. Lógica pura.
 
-import { CHAT_COOLDOWN_MS, CHAT_MAX_LENGTH, KILL_COOLDOWN_MS, MEETING_MS, RESULT_MS } from './config.js';
+import {
+  CHAT_COOLDOWN_MS,
+  CHAT_MAX_LENGTH,
+  EMERGENCY_COOLDOWN_MS,
+  KILL_COOLDOWN_MS,
+  MEETING_MS,
+  RESULT_MS,
+} from './config.js';
 import { isImpostor, playerList, roomInfo, toAll } from './info.js';
 import { sendAllToSpawn } from './lobby.js';
 import { checkVictory } from './victory.js';
+import { leaveAllVents } from './vents.js';
 
 const SKIP = 'skip';
 
@@ -16,6 +24,7 @@ export function startMeeting(room, callerId, bodyId, now) {
   room.bodies = [];
   for (const p of playerList(room)) p.taskStart = null;
   return [
+    ...leaveAllVents(room),
     toAll(roomInfo(room)),
     toAll({ t: 'bodies', list: [] }),
     toAll({ t: 'meeting', caller: callerId, body: bodyId, ms: MEETING_MS }),
@@ -91,6 +100,7 @@ function endMeeting(room, now) {
   if (ended.length) return ended;
   room.phase = 'playing';
   room.meeting = null;
+  room.emergencyReadyAt = now + EMERGENCY_COOLDOWN_MS;
   const out = [toAll(roomInfo(room)), ...sendAllToSpawn(room, now)];
   for (const p of playerList(room).filter(isImpostor)) {
     p.killReadyAt = now + KILL_COOLDOWN_MS;

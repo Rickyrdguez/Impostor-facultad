@@ -5,6 +5,7 @@ import * as game from './game.js';
 import * as lobby from './lobby.js';
 import * as actions from './actions.js';
 import * as meeting from './meeting.js';
+import * as vents from './vents.js';
 import { MAX_MESSAGE_BYTES, MAX_MESSAGES_PER_SECOND } from './config.js';
 import { CHAT_MAX_LENGTH, NAME_MAX_LENGTH, ROOM_CODE_LENGTH } from '../shared/constants.js';
 
@@ -71,6 +72,12 @@ const handlers = {
   report: simple(actions.report),
   'task-start': simple(actions.taskStart),
   'task-done': simple(actions.taskDone),
+  emergency: simple(actions.emergency),
+  vent: simple(vents.toggleVent),
+  'vent-move': {
+    valid: (m) => isShortString(m.to, ID_MAX_LENGTH),
+    run: (ws, m) => rooms.dispatch(ws, vents.moveVent, { to: m.to }),
+  },
   vote: {
     valid: (m) => isShortString(m.target, ID_MAX_LENGTH),
     run: (ws, m) => rooms.dispatch(ws, meeting.vote, { target: m.target }),

@@ -364,3 +364,72 @@
     font-size: 0.75rem;
   }
 }
+
+/* ---------- Trampillas ---------- */
+
+.vent-panel {
+  position: fixed;
+  left: 50%;
+  bottom: max(20px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+  max-width: calc(100% - 32px);
+}
+
+.vent-panel p {
+  margin: 0;
+}
+
+.vent-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+/* ---------- Mapa ---------- */
+
+.map-card {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 100%;
+  animation: pop 0.2s ease-out;
+}
+
+.map-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.map-head h2 {
+  margin: 0;
+  font-size: 1.3rem;
+  color: var(--brick);
+}
+
+#minimap-canvas {
+  display: block;
+  border-radius: 12px;
+  background: var(--night);
+  touch-action: none;
+}
+
+.map-card .hint {
+  margin: 0;
+  text-align: center;
+}
+
+.room-head .btn.secondary kbd {
+  background: rgba(0, 0, 0, 0.2);
+  border: none;
+  color: #fff;
+}

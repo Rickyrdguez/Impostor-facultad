@@ -46,6 +46,7 @@
       <div id="room-card" class="card room-card">
         <div class="room-head">
           <div class="room-code">Sala <strong id="room-code"></strong></div>
+          <button id="btn-map" class="btn small secondary hidden">Mapa <kbd>M</kbd></button>
           <button id="btn-leave" class="btn small ghost">Salir</button>
         </div>
         <ul id="player-list"></ul>
@@ -79,10 +80,29 @@
           <span class="act-label">Matar</span><kbd>Q</kbd>
         </button>
         <button id="act-use" class="act use" disabled>
-          <span class="act-label">Usar</span><kbd>E</kbd>
+          <span id="use-label" class="act-label">Usar</span><kbd>E</kbd>
         </button>
       </div>
     </section>
+
+    <!-- Panel dentro de una trampilla (solo el impostor) -->
+    <div id="vent-panel" class="card vent-panel hidden">
+      <p>Estás en la trampilla de <strong id="vent-room"></strong></p>
+      <div id="vent-links" class="vent-links"></div>
+      <button id="btn-vent-exit" class="btn small ghost">Salir <kbd>E</kbd></button>
+    </div>
+
+    <!-- Mapa (tecla M) -->
+    <div id="minimap" class="overlay hidden">
+      <div class="card map-card">
+        <div class="map-head">
+          <h2>Mapa de la ESIT</h2>
+          <button id="btn-map-close" class="btn small ghost">Cerrar <kbd>M</kbd></button>
+        </div>
+        <canvas id="minimap-canvas"></canvas>
+        <p id="map-legend" class="hint"></p>
+      </div>
+    </div>
 
     <!-- Selector de lenguaje (sala de espera) -->
     <div id="lang-picker" class="overlay hidden">

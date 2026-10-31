@@ -1,7 +1,7 @@
 // HUD de la partida: banner de rol, lista de tareas, progreso y botones de acción.
 
 import { state, amAlive, phase, playerInfo } from './state.js';
-import { act, killCooldownMs, killTarget, nearestTask, reportTarget } from './actions.js';
+import { act, killCooldownMs, killTarget, reportTarget, useTarget } from './actions.js';
 import { taskById } from '../../shared/constants.js';
 
 const BANNER_MS = 3600;
@@ -21,7 +21,11 @@ const els = {
   kill: $('act-kill'),
   report: $('act-report'),
   killCd: $('kill-cd'),
+  useLabel: $('use-label'),
+  mapBtn: $('btn-map'),
 };
+
+const USE_LABELS = { task: 'Usar', emergency: 'Reunión', vent: 'Trampilla' };
 let bannerTimer = null;
 
 // Los botones funcionan con ratón y con el dedo; "usar" hay que mantenerlo.
@@ -87,6 +91,7 @@ export function renderHudPhase() {
   const inMatch = phase() === 'playing' || phase() === 'meeting';
   els.taskCard.classList.toggle('hidden', !inMatch || !state.tasks.length);
   els.progress.classList.toggle('hidden', !inMatch);
+  els.mapBtn.classList.toggle('hidden', !inMatch);
   els.actions.classList.toggle('hidden', !inMatch);
   els.kill.classList.toggle('hidden', state.role !== 'impostor' || !amAlive());
   els.report.classList.toggle('hidden', !amAlive());
@@ -101,7 +106,10 @@ function setEnabled(btn, on) {
 // Cada fotograma: activa los botones según lo que haya cerca.
 export function updateButtons() {
   if (els.actions.classList.contains('hidden')) return;
-  setEnabled(els.use, Boolean(nearestTask()) || Boolean(state.hold));
+  const target = useTarget();
+  setEnabled(els.use, Boolean(target) || Boolean(state.hold));
+  const label = state.vent ? 'Salir' : USE_LABELS[target?.kind] || 'Usar';
+  if (els.useLabel.textContent !== label) els.useLabel.textContent = label;
   setEnabled(els.report, Boolean(reportTarget()));
   if (state.role !== 'impostor') return;
   setEnabled(els.kill, Boolean(killTarget()));

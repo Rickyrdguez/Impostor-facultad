@@ -1,7 +1,7 @@
 // Acciones durante la partida: matar, reportar y hacer tareas. Lógica pura.
 // El servidor elige el objetivo y comprueba distancias: no se fía del cliente.
 
-import { STATIONS } from '../client/js/map.js';
+import { EMERGENCY, STATIONS } from '../client/js/places.js';
 import {
   KILL_COOLDOWN_MS,
   KILL_RANGE,
@@ -32,8 +32,8 @@ function stationOf(taskId) {
 export function kill(room, id, msg, now) {
   const killer = room.players[id];
   if (room.phase !== 'playing' || !killer || !killer.alive || !isImpostor(killer)) return [];
-  if (now < killer.killReadyAt) return [];
-  const victims = playerList(room).filter((p) => p.alive && !isImpostor(p));
+  if (now < killer.killReadyAt || killer.vent) return [];
+  const victims = playerList(room).filter((p) => p.alive && !isImpostor(p) && !p.vent);
   const victim = nearest(killer, victims, KILL_RANGE);
   if (!victim) return [];
 
@@ -80,4 +80,18 @@ export function taskDone(room, id, msg, now) {
   if (!longEnough || !close || !task || task.done) return [];
   task.done = true;
   return [{ to: id, msg: tasksMessage(p) }, toAll(taskProgress(room)), ...checkVictory(room)];
+}
+
+// Botón de emergencia: una vez por jugador y partida, y no justo después de una reunión.
+export function emergency(room, id, msg, now) {
+  const p = room.players[id];
+  if (room.phase !== 'playing' || !p || !p.alive || p.vent) return [];
+  if (distance(p, EMERGENCY) > USE_RANGE) return [];
+  if (p.emergencyUsed) return [{ to: id, msg: { t: 'notice', text: 'Ya has usado tu botón de emergencia.' } }];
+  if (now < room.emergencyReadyAt) {
+    const s = Math.ceil((room.emergencyReadyAt - now) / 1000);
+    return [{ to: id, msg: { t: 'notice', text: `El botón estará listo en ${s} s.` } }];
+  }
+  p.emergencyUsed = true;
+  return startMeeting(room, id, null, now);
 }

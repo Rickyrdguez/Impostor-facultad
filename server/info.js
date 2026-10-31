@@ -24,6 +24,7 @@ export function roomInfo(room) {
     lang: p.lang,
     alive: p.alive,
     connected: p.connected,
+    buttonUsed: Boolean(p.emergencyUsed),
   }));
   return {
     t: 'room',

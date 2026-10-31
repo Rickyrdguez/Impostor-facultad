@@ -3,6 +3,7 @@
 import { LANGUAGES, TASKS } from '../shared/constants.js';
 import { spawnPoint } from '../client/js/map.js';
 import {
+  EMERGENCY_COOLDOWN_MS,
   IMPOSTORS,
   KILL_COOLDOWN_MS,
   MAX_PLAYERS,
@@ -80,8 +81,11 @@ export function startGame(room, id, msg, now) {
     p.tasks = randomTasks();
     p.taskStart = null;
     p.killReadyAt = now + KILL_COOLDOWN_MS;
+    p.emergencyUsed = false;
+    p.vent = null;
   }
   room.phase = 'playing';
+  room.emergencyReadyAt = now + EMERGENCY_COOLDOWN_MS;
   room.bodies = [];
   room.meeting = null;
   const out = [toAll(roomInfo(room)), toAll(taskProgress(room)), toAll({ t: 'bodies', list: [] })];
@@ -99,6 +103,7 @@ export function backToLobby(room, now) {
     p.role = null;
     p.tasks = [];
     p.taskStart = null;
+    p.vent = null;
   }
   room.phase = 'lobby';
   room.bodies = [];

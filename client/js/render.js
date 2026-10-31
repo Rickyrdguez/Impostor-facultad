@@ -43,6 +43,11 @@ function cameraScale() {
   return (Math.min(innerWidth, innerHeight) / VIEW_SIZE) * dpr;
 }
 
+// Canvas con el mapa pre-dibujado (lo reutiliza el mapa de la tecla M).
+export function getMapCanvas() {
+  return mapCanvas;
+}
+
 // El mapa y la rejilla de visión se preparan una vez al cargar.
 export function prepareMap() {
   const wanted = Math.max(1, cameraScale());

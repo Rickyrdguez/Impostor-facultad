@@ -2,7 +2,8 @@
 
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { MAP, ROOMS, STATIONS, canStand, spawnPoint } from '../client/js/map.js';
+import { MAP, ROOMS, canStand, spawnPoint } from '../client/js/map.js';
+import { STATIONS, VENTS, EMERGENCY } from '../client/js/places.js';
 import { PLAYER_RADIUS, TASKS, USE_RANGE } from '../shared/constants.js';
 import { MAX_PLAYERS } from '../server/config.js';
 
@@ -11,7 +12,8 @@ const GRID = 10;
 // Relleno por inundación desde el punto de aparición.
 function reachableCells() {
   const seen = new Set();
-  const start = [Math.round(MAP.spawn.x / GRID), Math.round(MAP.spawn.y / GRID)];
+  const p = spawnPoint(0, MAX_PLAYERS);
+  const start = [Math.round(p.x / GRID), Math.round(p.y / GRID)];
   const queue = [start];
   seen.add(start.join());
   while (queue.length) {
@@ -67,4 +69,23 @@ test('cada tarea tiene una estación alcanzable', () => {
     const ok = cells.some(([x, y]) => Math.hypot(x - sx, y - sy) <= USE_RANGE * 0.7);
     assert.ok(ok, `no se llega a la estación de ${task.id}`);
   }
+});
+
+// ¿Hay algún punto alcanzable a menos de range de (x, y)?
+function reachableNear(x, y, range) {
+  return [...reachableCells()].some((k) => {
+    const [cx, cy] = k.split(',').map((v) => v * GRID);
+    return Math.hypot(cx - x, cy - y) <= range;
+  });
+}
+
+test('las trampillas están en el suelo y se puede llegar a ellas', () => {
+  for (const v of VENTS) {
+    assert.ok(canStand(v.x, v.y, PLAYER_RADIUS), `trampilla ${v.id} bloqueada`);
+    assert.ok(reachableNear(v.x, v.y, 10), `no se llega a la trampilla ${v.id}`);
+  }
+});
+
+test('se puede llegar al botón de emergencia', () => {
+  assert.ok(reachableNear(EMERGENCY.x, EMERGENCY.y, USE_RANGE * 0.8));
 });

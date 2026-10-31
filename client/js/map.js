@@ -13,7 +13,7 @@ export const ROOMS = [
   // Pasillo real de la facultad: baja del gran pasillo a la cafetería
   { id: 'pasillo', name: 'Pasillo', rect: [460, 930, 180, 530], floor: 'baldosa', label: [550, 1330] },
   { id: 'exterior', name: 'Exterior', rect: [1600, 930, 100, 520], floor: 'piedra', label: [1650, 1190] },
-  { id: 'hall', name: 'Gran pasillo', rect: [100, 640, 1600, 300], floor: 'baldosa' },
+  { id: 'hall', name: 'Gran pasillo', rect: [100, 640, 1600, 300], floor: 'baldosa', label: [900, 700] },
   { id: 'banos', name: 'Baños', rect: [100, 1000, 320, 300], floor: 'azul', label: [260, 1150] },
   { id: 'ascensor', name: 'Ascensor', rect: [680, 1000, 220, 220], floor: 'terrazo', label: [770, 1180] },
   { id: 'clase', name: 'Clase', rect: [940, 980, 620, 270], floor: 'madera', label: [1250, 1225] },
@@ -51,6 +51,7 @@ export const OBSTACLES = [
   { kind: 'banco', rect: [1230, 775, 150, 30] },
   { kind: 'columna', circle: [700, 790, 20] },
   { kind: 'columna', circle: [1100, 790, 20] },
+  { kind: 'emergencia', circle: [900, 790, 26] }, // mesa del botón de emergencia
   // Baños: lavabos y cubículos
   { kind: 'lavabo', rect: [110, 1030, 40, 170] },
   { kind: 'mampara', rect: [200, 1215, 10, 85] },
@@ -83,29 +84,6 @@ export const OBSTACLES = [
   { kind: 'maceta', circle: [1000, 2255, 18] },
   { kind: 'maceta', circle: [1300, 2255, 18] },
 ];
-
-// Estaciones de tareas: id de la tarea (shared/constants.js) -> [x, y].
-export const STATIONS = {
-  matricula: [310, 365],
-  certificado: [230, 230],
-  ventana: [900, 105],
-  maquina: [1605, 145],
-  sofa: [1290, 200],
-  tablon: [300, 665],
-  wifi: [1550, 665],
-  lavarse: [170, 1120],
-  papel: [245, 1265],
-  ascensor: [825, 1060],
-  proyector: [1525, 1210],
-  entregar: [1110, 1205],
-  compilar: [200, 1625],
-  osciloscopio: [200, 1885],
-  fotocopias: [1315, 1858],
-  libro: [1638, 1870],
-  cafe: [1078, 1495],
-  mesas: [800, 1960],
-  plantas: [620, 2220],
-};
 
 // Objetos altos que tapan la vista (el resto son bajos y se ve por encima).
 export const OPAQUE_KINDS = new Set(['armario', 'maquina', 'ascensor', 'columna', 'lucernario', 'mampara']);

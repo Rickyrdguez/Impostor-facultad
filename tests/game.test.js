@@ -6,7 +6,7 @@ import * as game from '../server/game.js';
 import * as lobby from '../server/lobby.js';
 import * as actions from '../server/actions.js';
 import * as meeting from '../server/meeting.js';
-import { STATIONS } from '../client/js/map.js';
+import { STATIONS } from '../client/js/places.js';
 import { KILL_COOLDOWN_MS, MEETING_MS, RESULT_MS, TASK_HOLD_MS } from '../server/config.js';
 
 const T0 = 1_000_000;
@@ -160,4 +160,46 @@ test('los vivos no ven a los fantasmas en las posiciones', () => {
   const forGhost = out.find((o) => o.to === crew[0].id).msg.p.map(([id]) => id);
   assert.ok(!forAlive.includes(crew[0].id));
   assert.ok(forGhost.includes(crew[0].id));
+});
+
+test('botón de emergencia: una vez por jugador y con enfriamiento', async () => {
+  const { EMERGENCY } = await import('../client/js/places.js');
+  const { EMERGENCY_COOLDOWN_MS } = await import('../server/config.js');
+  const { room, crew } = startedRoom(4);
+  const p = crew[0];
+  Object.assign(p, { x: EMERGENCY.x + 50, y: EMERGENCY.y });
+  const early = actions.emergency(room, p.id, {}, T0 + 1000);
+  assert.equal(msgs(early, 'notice').length, 1);
+  assert.equal(room.phase, 'playing');
+  actions.emergency(room, p.id, {}, T0 + EMERGENCY_COOLDOWN_MS);
+  assert.equal(room.phase, 'meeting');
+  assert.equal(room.meeting.body, null);
+  // Tras la reunión ya no puede volver a pulsarlo
+  game.tick(room, T0 + EMERGENCY_COOLDOWN_MS + MEETING_MS);
+  game.tick(room, T0 + EMERGENCY_COOLDOWN_MS + MEETING_MS + RESULT_MS);
+  assert.equal(room.phase, 'playing');
+  Object.assign(p, { x: EMERGENCY.x + 50, y: EMERGENCY.y });
+  const again = actions.emergency(room, p.id, {}, T0 + 10 * EMERGENCY_COOLDOWN_MS);
+  assert.match(msgs(again, 'notice')[0].msg.text, /Ya has usado/);
+});
+
+test('trampillas: solo el impostor, invisible dentro y salto a las conectadas', async () => {
+  const vents = await import('../server/vents.js');
+  const { VENTS } = await import('../client/js/places.js');
+  const { room, impostor, crew } = startedRoom(4);
+  const banos = VENTS.find((v) => v.id === 'banos');
+  Object.assign(crew[0], { x: banos.x, y: banos.y });
+  assert.deepEqual(vents.toggleVent(room, crew[0].id, {}, T0), []);
+  Object.assign(impostor, { x: banos.x + 10, y: banos.y });
+  vents.toggleVent(room, impostor.id, {}, T0);
+  assert.equal(impostor.vent, 'banos');
+  const snap = game.tick(room, T0).find((o) => o.to === crew[1].id).msg.p.map(([id]) => id);
+  assert.ok(!snap.includes(impostor.id), 'dentro de la trampilla no se le ve');
+  assert.deepEqual(vents.moveVent(room, impostor.id, { to: 'terraza' }, T0), []); // otra red
+  vents.moveVent(room, impostor.id, { to: 'laboratorio' }, T0);
+  assert.equal(impostor.vent, 'laboratorio');
+  assert.deepEqual(game.handleMove(room, impostor.id, { x: impostor.x + 5, y: impostor.y }, T0 + 50), []);
+  vents.toggleVent(room, impostor.id, {}, T0 + 100);
+  assert.equal(impostor.vent, null);
+  assert.equal(Math.round(impostor.y), VENTS.find((v) => v.id === 'laboratorio').y);
 });

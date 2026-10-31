@@ -17,6 +17,8 @@ export const state = {
   bodies: [], // [{ id, x, y }]
   killReadyAt: 0, // performance.now() a partir del cual se puede matar
   hold: null, // tarea en curso: { id, start }
+  vent: null, // trampilla en la que está el impostor (o null)
+  mapOpen: false,
 };
 
 export function myInfo() {
@@ -49,4 +51,5 @@ export function resetMatch() {
   state.bodies = [];
   state.killReadyAt = 0;
   state.hold = null;
+  state.vent = null;
 }

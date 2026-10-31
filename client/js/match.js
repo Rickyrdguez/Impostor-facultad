@@ -8,11 +8,17 @@ import * as meeting from './meeting.js';
 import * as end from './endscreen.js';
 import { renderLobby } from './lobby.js';
 import { onSnapshot, setMyPosition } from './players.js';
+import { onVent } from './ventui.js';
+import { toggleMinimap } from './minimap.js';
 
 let lastPhase = null;
 
 // Cambio de fase de la sala: qué pantallas se abren o se cierran.
 function onPhaseChange(now) {
+  if (now !== 'playing') {
+    onVent(null);
+    toggleMinimap(false);
+  }
   if (now === 'lobby') {
     resetMatch();
     end.hideEnd();
@@ -87,10 +93,14 @@ net.on('end', (m) => {
 
 net.on('notice', (m) => ui.toast(m.text));
 
+net.on('vent', (m) => onVent(m.id));
+
 // Al salir de la sala hay que olvidar la fase para que la próxima empiece limpia.
 export function forgetPhase() {
   lastPhase = null;
   resetMatch();
+  onVent(null);
+  toggleMinimap(false);
   meeting.closeMeeting();
   end.hideEnd();
 }

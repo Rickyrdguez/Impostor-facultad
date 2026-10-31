@@ -24,7 +24,7 @@ export function isFull(room) {
 // Posiciones [id, x, y]. Los vivos no ven a los fantasmas; los fantasmas ven a todos.
 function snapshot(room, withGhosts) {
   const p = Object.values(room.players)
-    .filter((pl) => withGhosts || pl.alive)
+    .filter((pl) => (withGhosts || pl.alive) && !pl.vent)
     .map((pl) => [pl.id, Math.round(pl.x), Math.round(pl.y)]);
   return { t: 's', p };
 }
@@ -89,7 +89,7 @@ export function setConnected(room, id, connected) {
 // Movimiento enviado por el cliente: se valida velocidad y paredes.
 export function handleMove(room, id, msg, now) {
   const p = room.players[id];
-  if (!p || room.phase === 'meeting') return [];
+  if (!p || room.phase === 'meeting' || p.vent) return [];
   const ghost = !p.alive;
   const dt = Math.min(now - p.lastMoveAt, MOVE_MAX_DT_MS);
   const maxDist = (PLAYER_SPEED * Math.max(dt, 0)) / 1000 * MOVE_TOLERANCE + MOVE_SLACK;
@@ -114,6 +114,7 @@ export function rejoinState(room, id, now) {
     out.push(to(roleMessage(room, p)), to(tasksMessage(p)), to(taskProgress(room)));
   }
   if (p.role === 'impostor') out.push(to({ t: 'cooldown', ms: Math.max(0, p.killReadyAt - now) }));
+  if (p.vent) out.push(to({ t: 'vent', id: p.vent }));
   const m = room.meeting;
   if (m) {
     const ms = Math.max(0, m.endsAt - now);
