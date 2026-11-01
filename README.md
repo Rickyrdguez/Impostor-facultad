@@ -8,6 +8,14 @@ que no deja entregar las prácticas.
 Se juega online desde cualquier red (casa, datos móviles, wifi de la
 facultad), en el ordenador o en el móvil, sin instalar nada.
 
+<p align="center">
+  <a href="https://impostor-facultad.onrender.com">
+    <img alt="▶ Jugar ahora" src="https://img.shields.io/badge/%E2%96%B6%20Jugar%20ahora-c9803f?style=for-the-badge" height="44" />
+  </a>
+</p>
+
+<p align="center"><em>La primera vez puede tardar hasta un minuto en arrancar (el servidor gratuito se duerme cuando nadie lo usa). Necesitas 3 jugadores para empezar: pasa el código de sala a tus amigos.</em></p>
+
 ![Partida en el gran pasillo](docs/partida.jpg)
 
 | | |
@@ -16,18 +24,28 @@ facultad), en el ordenador o en el móvil, sin instalar nada.
 | ![Minijuego del sofá](docs/minijuego.jpg) | ![Mapa con la M](docs/mapa.jpg) |
 | ![Expulsión](docs/expulsion.jpg) | ![Pantalla final](docs/final.jpg) |
 
+## Probar el juego
+
+1. Abre **https://impostor-facultad.onrender.com** (si tarda, es que el
+   servidor se está despertando: espera un minuto).
+2. Escribe tu nombre, pulsa **Crear sala** y comparte el código de 4 letras
+   que aparece arriba a la izquierda.
+3. Cuando se hayan unido al menos 3 jugadores, el anfitrión pulsa
+   **Empezar partida**.
+
 ## Cómo se juega
 
 - **De 3 a 10 jugadores.** Uno crea la sala y pasa el código de 4 letras.
   Cada uno elige su lenguaje (Python, JavaScript, Java, C++, Rust, Go…) y el
   anfitrión pulsa **Empezar partida**.
-- **Hay un impostor.** El resto son tripulantes y tienen 3 tareas repartidas
-  por la facultad. Las marcan flechas amarillas y salen en el mapa (tecla M).
+- **Hay un impostor** (o más, según los ajustes). El resto son tripulantes y
+  tienen 3 tareas repartidas por la facultad. Las marcan flechas amarillas y
+  salen en el mapa (tecla M).
   Cada tarea es un minijuego: despertar al que duerme en el sofá, fotocopiar
   apuntes, conectar los cables del proyector, pedir un barraquito, compilar
   sin errores… Si el equipo termina todas, ganan los tripulantes.
 - **El impostor** tiene tareas falsas para disimular y además puede:
-  - **Matar** a un tripulante cercano (cada 15 s). Deja un cuerpo.
+  - **Matar** a un tripulante cercano (cada 15 s por defecto). Deja un cuerpo.
   - **Moverse por trampillas** conectadas: baños ↔ laboratorio,
     secretaría ↔ cafetería, zona relax ↔ sala de estudio y
     ascensor ↔ clase ↔ terraza.
@@ -36,8 +54,9 @@ facultad), en el ordenador o en el móvil, sin instalar nada.
     hay que cerrar las válvulas del Laboratorio y de Secretaría antes de
     45 s o gana el impostor.
 - **Reuniones.** Quien encuentre un cuerpo lo reporta, o cualquiera pulsa el
-  botón de emergencia del gran pasillo (una vez por partida). Hay 40 s para
-  hablar por chat y votar; el más votado sale expulsado (con empate, nadie).
+  botón de emergencia del gran pasillo (una vez por partida, por defecto).
+  Hay 40 s para hablar por chat y votar; el más votado sale expulsado (con
+  empate, nadie).
 - **Visión limitada.** Solo ves lo que tienes alrededor y las paredes y los
   muebles altos tapan la vista. El impostor ve un poco más lejos.
 - **Los muertos** son fantasmas: atraviesan paredes, lo ven todo y, si eran
@@ -109,9 +128,10 @@ el mismo puerto, así que se puede desplegar gratis en
    repositorio y lo configura todo solo.)
 
 3. **Espera al despliegue** (un par de minutos) hasta que salga **Live**.
-   Render te da una URL del tipo `https://impostor-facultad.onrender.com`.
+   Render te da una URL del tipo `https://TU-SERVICIO.onrender.com` (la de
+   este proyecto es https://impostor-facultad.onrender.com).
 
-4. **Comprueba que vive:** `https://TU-URL.onrender.com/health` debe
+4. **Comprueba que vive:** `https://TU-SERVICIO.onrender.com/health` debe
    responder `ok`. Después abre la URL principal y crea una sala.
 
 5. **Pasa el enlace a tus amigos.** Cada `git push` vuelve a desplegar solo.
